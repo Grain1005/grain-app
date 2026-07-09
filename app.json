@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "Grain",
+    "slug": "grain",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#0FA4AF"
+      },
+      "package": "com.grain.app"
+    },
+    "platforms": [
+      "android"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "df12dac4-59d0-4ec0-9ed0-9b0bb0323dea"
+      }
+    },
+    "plugins": [
+      "expo-font"
+    ]
+  }
+}
