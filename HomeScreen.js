@@ -5,19 +5,36 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
+  Animated,
+  LayoutAnimation,
+  Platform,
+  UIManager,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, spacing, radius } from './theme';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, spacing, radius, typography } from './theme';
 import {
   getPillars,
   getLogs,
   togglePillarCompletion,
-  getPillarStreak,
+  getOverallStreak,
+  getActivitiesForPillar,
+  saveActivityLog,
+  getActivityLogs,
   todayKey,
 } from './storage';
-import { trackPillarLogged, trackPillarUnlogged, trackStreakMilestone } from './analytics';
+import {
+  trackPillarLogged,
+  trackPillarUnlogged,
+  trackStreakMilestone,
+  trackSettingsOpened,
+} from './analytics';
+
+// Enable LayoutAnimation on Android
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
+}
 
 const getGreeting = () => {
   const hour = new Date().getHours();
@@ -30,15 +47,25 @@ export default function HomeScreen({ navigation }) {
   const [pillars, setPillars] = useState([]);
   const [logs, setLogs] = useState({});
   const [todayLog, setTodayLog] = useState([]);
+  const [streak, setStreak] = useState(0);
+  const [expandedPillar, setExpandedPillar] = useState(null);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [todayActivities, setTodayActivities] = useState({});
 
   const loadData = useCallback(async () => {
     try {
       const allPillars = await getPillars();
       const allLogs = await getLogs();
       const dayLog = allLogs[todayKey()] || [];
+      const currentStreak = getOverallStreak(allLogs);
+      const actLogs = await getActivityLogs();
+      const todayActs = actLogs[todayKey()] || {};
+
       setPillars(allPillars);
       setLogs(allLogs);
       setTodayLog(dayLog);
+      setStreak(currentStreak);
+      setTodayActivities(todayActs);
     } catch (e) {
       console.log('HomeScreen loadData error:', e);
     }
@@ -47,53 +74,97 @@ export default function HomeScreen({ navigation }) {
   useFocusEffect(
     useCallback(() => {
       loadData();
+      // Reset expanded state when screen focuses
+      setExpandedPillar(null);
+      setSelectedActivity(null);
     }, [loadData])
   );
 
-  const handleToggle = async (pillar) => {
+  const handlePillarTap = (pillar) => {
+    const isDone = todayLog.includes(pillar.id);
+
+    if (isDone) {
+      // If already done, tapping again undoes it
+      handleUndoPillar(pillar.id);
+      return;
+    }
+
+    // Expand to show activities
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+    if (expandedPillar === pillar.id) {
+      setExpandedPillar(null);
+      setSelectedActivity(null);
+    } else {
+      setExpandedPillar(pillar.id);
+      setSelectedActivity(null);
+    }
+  };
+
+  const handleLogWithActivity = async (pillarId) => {
     try {
-      const wasDone = todayLog.includes(pillar.id);
-      await togglePillarCompletion(pillar.id);
-      if (wasDone) {
-        trackPillarUnlogged(pillar.name);
-      } else {
-        trackPillarLogged(pillar.name);
-        const newLogs = await getLogs();
-        const streak = getPillarStreak(newLogs, pillar.id);
-        if ([3, 7, 14, 30, 60, 90].includes(streak)) {
-          trackStreakMilestone(streak);
-        }
+      // Save the selected activity if one was picked
+      if (selectedActivity) {
+        await saveActivityLog(pillarId, selectedActivity);
       }
+      // Mark pillar as complete
+      const updatedLogs = await togglePillarCompletion(pillarId);
+      const newStreak = getOverallStreak(updatedLogs);
+
+      trackPillarLogged(pillarId);
+      if ([3, 7, 14, 30, 60, 90].includes(newStreak)) {
+        trackStreakMilestone(newStreak);
+      }
+
+      // Collapse the expanded card
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setExpandedPillar(null);
+      setSelectedActivity(null);
+
       await loadData();
     } catch (e) {
-      console.log('Toggle error:', e);
+      console.log('Log error:', e);
     }
   };
 
-  const isDone = (pillarId) => todayLog.includes(pillarId);
+  const handleSkipAndLog = async (pillarId) => {
+    try {
+      const updatedLogs = await togglePillarCompletion(pillarId);
+      const newStreak = getOverallStreak(updatedLogs);
 
-  const getOverallStreak = () => {
-    let streak = 0;
-    const today = new Date();
-    for (let i = 0; i < 365; i++) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const dayLog = logs[key] || [];
-      if (dayLog.length > 0) {
-        streak++;
-      } else if (i > 0) {
-        break;
+      trackPillarLogged(pillarId);
+      if ([3, 7, 14, 30, 60, 90].includes(newStreak)) {
+        trackStreakMilestone(newStreak);
       }
+
+      LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+      setExpandedPillar(null);
+      setSelectedActivity(null);
+
+      await loadData();
+    } catch (e) {
+      console.log('Skip log error:', e);
     }
-    return streak;
   };
 
-  const streak = getOverallStreak();
-  const completedCount = pillars.filter((p) => isDone(p.id)).length;
-  const totalPillars = pillars.length;
-  const allDone = totalPillars > 0 && completedCount === totalPillars;
-  const progressPct = totalPillars > 0 ? Math.round((completedCount / totalPillars) * 100) : 0;
+  const handleUndoPillar = async (pillarId) => {
+    try {
+      await togglePillarCompletion(pillarId);
+      trackPillarUnlogged(pillarId);
+      await loadData();
+    } catch (e) {
+      console.log('Undo error:', e);
+    }
+  };
+
+  const toggleActivityChip = (label) => {
+    setSelectedActivity(selectedActivity === label ? null : label);
+  };
+
+  const doneCount = todayLog.length;
+  const totalCount = pillars.length;
+  const allDone = totalCount > 0 && doneCount >= totalCount;
+
+  const streakLabel = streak === 0 ? 'Start today!' : streak === 1 ? 'Keep going!' : 'On fire!';
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -103,409 +174,491 @@ export default function HomeScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={styles.headerRow}>
           <View>
             <Text style={styles.greeting}>{getGreeting()}</Text>
-            <Text style={styles.greetingSub}>Ready for your 8 minutes?</Text>
+            <Text style={styles.subGreeting}>Ready for your 8 minutes?</Text>
           </View>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Settings')}
-            style={styles.settingsBtn}
-            hitSlop={8}
+            onPress={() => {
+              trackSettingsOpened();
+              navigation.navigate('Settings');
+            }}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            <Ionicons name="settings-outline" size={18} color={colors.textSecondary} />
+            <Ionicons name="settings-outline" size={24} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
 
-        {/* Teal 8-minute card */}
-        <View style={styles.investCard}>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.investLabel}>Your daily investment</Text>
-            <View style={styles.investNumRow}>
-              <Text style={styles.investNum}>8</Text>
-              <Text style={styles.investUnit}>minutes</Text>
-            </View>
-            <Text style={styles.investTagline}>Small grains. Massive results.</Text>
-          </View>
-          <View style={styles.investRight}>
-            <View style={styles.investIconCircle}>
-              <Ionicons name="time-outline" size={22} color={colors.white} />
-            </View>
-            <Text style={styles.investPerDay}>PER DAY</Text>
-          </View>
-        </View>
-
-        {/* Streak + Progress row */}
-        <View style={styles.statsRow}>
-          {/* Streak card */}
-          <View style={styles.streakCard}>
-            <Text style={styles.streakNum}>{streak}</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.streakTitle}>day streak</Text>
-              <Text style={styles.streakSub}>{streak > 0 ? 'Keep going!' : 'Start today!'}</Text>
-            </View>
-            <Ionicons name="flame" size={20} color={colors.coral} />
-          </View>
-
-          {/* Progress card */}
-          <View style={styles.progressCard}>
-            <Text style={styles.progressNum}>
-              {completedCount}/{totalPillars}
-            </Text>
-            <Text style={styles.progressTitle}>done today</Text>
-            <View style={styles.progressBarBg}>
-              <View style={[styles.progressBarFill, { width: `${progressPct}%` }]} />
-            </View>
-          </View>
-        </View>
-
-        {/* Section */}
-        <Text style={styles.sectionTitle}>Today's Pillars</Text>
-        <Text style={styles.sectionSub}>Tap to log your session</Text>
-
-        {pillars.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="layers-outline" size={40} color={colors.sand} />
-            <Text style={styles.emptyTitle}>No pillars yet</Text>
-            <Text style={styles.emptySub}>Go to Settings to add your first pillar.</Text>
-            <TouchableOpacity
-              style={styles.emptyBtn}
-              onPress={() => navigation.navigate('Settings')}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.emptyBtnText}>Add pillars</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <>
-            {allDone && (
-              <View style={styles.allDoneBanner}>
-                <Ionicons name="checkmark-circle" size={18} color={colors.green} />
-                <Text style={styles.allDoneText}>All done for today! Come back tomorrow.</Text>
+        {/* Hero Card */}
+        <View style={styles.heroCard}>
+          <View style={styles.heroTop}>
+            <View>
+              <Text style={styles.heroLabel}>Your daily investment</Text>
+              <View style={styles.heroNumberRow}>
+                <Text style={styles.heroNumber}>8</Text>
+                <Text style={styles.heroUnit}> minutes</Text>
               </View>
-            )}
-            {pillars.map((pillar) => {
-              const done = isDone(pillar.id);
-              return (
-                <TouchableOpacity
-                  key={pillar.id}
-                  style={[styles.pillarCard, done && styles.pillarCardDone]}
-                  activeOpacity={0.85}
-                  onPress={() => handleToggle(pillar)}
-                >
+              <Text style={styles.heroTagline}>Small grains. Massive results.</Text>
+            </View>
+            <View style={styles.heroBadge}>
+              <Ionicons name="time-outline" size={18} color={colors.white} />
+              <Text style={styles.heroBadgeText}>PER DAY</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Stats Row */}
+        <View style={styles.statsRow}>
+          <View style={[styles.statCard, styles.streakCard]}>
+            <Text style={[styles.statNumber, { color: colors.coral }]}>{streak}</Text>
+            <Text style={styles.statLabel}>day streak</Text>
+            <Text style={styles.statSub}>{streakLabel}</Text>
+          </View>
+          <View style={[styles.statCard, styles.doneCard]}>
+            <Text style={[styles.statNumber, { color: colors.teal }]}>
+              {doneCount}/{totalCount}
+            </Text>
+            <Text style={styles.statLabel}>done today</Text>
+          </View>
+        </View>
+
+        {/* Today's Pillars */}
+        <Text style={styles.sectionTitle}>Today's Pillars</Text>
+        <Text style={styles.sectionSub}>Tap a pillar to see ideas & log your session</Text>
+
+        {allDone && (
+          <View style={styles.allDoneBanner}>
+            <Text style={styles.allDoneIcon}>✅</Text>
+            <Text style={styles.allDoneText}>All done for today! Come back tomorrow.</Text>
+          </View>
+        )}
+
+        {pillars.map((pillar) => {
+          const isDone = todayLog.includes(pillar.id);
+          const isExpanded = expandedPillar === pillar.id;
+          const activities = getActivitiesForPillar(pillar);
+          const loggedActivity = todayActivities[pillar.id];
+
+          return (
+            <View key={pillar.id}>
+              <TouchableOpacity
+                style={[
+                  styles.pillarCard,
+                  isDone && styles.pillarCardDone,
+                  isExpanded && styles.pillarCardExpanded,
+                ]}
+                onPress={() => handlePillarTap(pillar)}
+                activeOpacity={0.7}
+              >
+                {/* Pillar header row */}
+                <View style={styles.pillarTop}>
                   <View style={styles.pillarLeft}>
-                    <View style={[styles.check, done && styles.checkDone]}>
-                      {done && <Ionicons name="checkmark" size={14} color={colors.white} />}
+                    <View style={[styles.checkbox, isDone && styles.checkboxDone]}>
+                      {isDone && <Text style={styles.checkmark}>✓</Text>}
                     </View>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.pillarName, done && styles.pillarNameDone]}>
+                    <View style={styles.pillarInfo}>
+                      <Text style={[styles.pillarName, isDone && styles.pillarNameDone]}>
                         {pillar.name}
                       </Text>
                       <Text style={styles.pillarMeta}>
-                        {pillar.category} {'\u00B7'} {pillar.minutes || 8} min/day
+                        {pillar.category} · {pillar.minutes} min/day
+                        {loggedActivity ? ` · ${loggedActivity}` : ''}
                       </Text>
                     </View>
                   </View>
-                  {done && (
+                  {isDone ? (
                     <View style={styles.doneBadge}>
                       <Text style={styles.doneBadgeText}>Done</Text>
                     </View>
+                  ) : (
+                    <Text style={[styles.arrow, isExpanded && styles.arrowExpanded]}>›</Text>
                   )}
-                </TouchableOpacity>
-              );
-            })}
-          </>
-        )}
+                </View>
 
-        <View style={{ height: 24 }} />
+                {/* Activity suggestions panel (visible when expanded) */}
+                {isExpanded && !isDone && (
+                  <View style={styles.activityPanel}>
+                    <View style={styles.activityDivider} />
+
+                    <View style={styles.activityHeader}>
+                      <Ionicons name="bulb-outline" size={14} color={colors.teal} />
+                      <Text style={styles.activityHeaderText}>WHAT WILL YOU DO TODAY?</Text>
+                    </View>
+
+                    <View style={styles.chipContainer}>
+                      {activities.map((act, idx) => (
+                        <TouchableOpacity
+                          key={idx}
+                          style={[
+                            styles.activityChip,
+                            selectedActivity === act.label && styles.activityChipSelected,
+                          ]}
+                          onPress={() => toggleActivityChip(act.label)}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={styles.chipEmoji}>{act.emoji}</Text>
+                          <Text
+                            style={[
+                              styles.chipLabel,
+                              selectedActivity === act.label && styles.chipLabelSelected,
+                            ]}
+                          >
+                            {act.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+
+                    <TouchableOpacity
+                      style={styles.logBtn}
+                      onPress={() => handleLogWithActivity(pillar.id)}
+                      activeOpacity={0.8}
+                    >
+                      <Text style={styles.logBtnText}>Log session ✓</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                      style={styles.skipBtn}
+                      onPress={() => handleSkipAndLog(pillar.id)}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={styles.skipText}>
+                        or <Text style={styles.skipLink}>skip & just log</Text>
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+          );
+        })}
+
+        {/* Bottom spacing */}
+        <View style={{ height: 30 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.white },
-  scroll: { flex: 1 },
-  content: { paddingBottom: 32 },
+  safe: {
+    flex: 1,
+    backgroundColor: colors.white,
+  },
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    padding: spacing.lg,
+    paddingBottom: 40,
+  },
 
   // Header
-  header: {
+  headerRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-  greeting: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    letterSpacing: -0.5,
-  },
-  greetingSub: {
-    fontSize: 13,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  settingsBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: '#F7F6F1',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-  },
-
-  // Teal investment card
-  investCard: {
-    marginHorizontal: spacing.md,
-    marginBottom: 10,
-    backgroundColor: colors.teal,
-    borderRadius: 16,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  investLabel: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: 'rgba(255,255,255,0.7)',
-  },
-  investNumRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: 4,
-    marginTop: 2,
-  },
-  investNum: {
-    fontSize: 36,
-    fontWeight: '700',
-    color: colors.white,
-    lineHeight: 40,
-    letterSpacing: -1,
-  },
-  investUnit: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.9)',
-  },
-  investTagline: {
-    fontSize: 10,
-    color: 'rgba(255,255,255,0.55)',
-    marginTop: 3,
-  },
-  investRight: {
-    alignItems: 'center',
-    gap: 3,
-  },
-  investIconCircle: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  investPerDay: {
-    fontSize: 8,
-    fontWeight: '700',
-    color: 'rgba(255,255,255,0.5)',
-    letterSpacing: 0.5,
-  },
-
-  // Stats row
-  statsRow: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.md,
-    gap: 8,
+    alignItems: 'flex-start',
     marginBottom: spacing.md,
   },
-
-  // Streak card
-  streakCard: {
-    flex: 1,
-    backgroundColor: '#FFF5F3',
-    borderRadius: 14,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#FFE8E4',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  streakNum: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.coral,
-    lineHeight: 32,
-  },
-  streakTitle: {
-    fontSize: 11,
-    fontWeight: '600',
+  greeting: {
+    ...typography.h1,
     color: colors.textPrimary,
   },
-  streakSub: {
-    fontSize: 9,
+  subGreeting: {
+    ...typography.body,
     color: colors.textSecondary,
-  },
-
-  // Progress card
-  progressCard: {
-    flex: 1,
-    backgroundColor: '#F0FAF0',
-    borderRadius: 14,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#c8e6a8',
-    alignItems: 'center',
-  },
-  progressNum: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#5a9a2f',
-    lineHeight: 32,
-  },
-  progressTitle: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: colors.textPrimary,
     marginTop: 2,
   },
-  progressBarBg: {
-    width: '100%',
-    height: 4,
-    backgroundColor: '#c8e6a8',
-    borderRadius: 2,
-    marginTop: 6,
-    overflow: 'hidden',
+
+  // Hero
+  heroCard: {
+    backgroundColor: colors.teal,
+    borderRadius: radius.card,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
   },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: '#5a9a2f',
-    borderRadius: 2,
+  heroTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  heroLabel: {
+    ...typography.caption,
+    color: 'rgba(255,255,255,0.85)',
+    fontWeight: '500',
+  },
+  heroNumberRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginTop: 2,
+  },
+  heroNumber: {
+    fontSize: 36,
+    fontWeight: '800',
+    color: colors.white,
+  },
+  heroUnit: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  heroTagline: {
+    ...typography.caption,
+    color: 'rgba(255,255,255,0.65)',
+    marginTop: 4,
+  },
+  heroBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+    gap: 4,
+  },
+  heroBadgeText: {
+    ...typography.caption,
+    color: colors.white,
+    fontWeight: '600',
+    fontSize: 11,
+  },
+
+  // Stats
+  statsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: spacing.lg,
+  },
+  statCard: {
+    flex: 1,
+    borderRadius: radius.card,
+    padding: spacing.md,
+    alignItems: 'center',
+  },
+  streakCard: {
+    backgroundColor: '#FEF0EE',
+  },
+  doneCard: {
+    backgroundColor: '#F0F7E4',
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: '800',
+  },
+  statLabel: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+  statSub: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontSize: 10,
+    marginTop: 1,
   },
 
   // Section
   sectionTitle: {
-    paddingHorizontal: spacing.md,
-    fontSize: 15,
-    fontWeight: '700',
+    ...typography.h2,
     color: colors.textPrimary,
     marginBottom: 2,
   },
   sectionSub: {
-    paddingHorizontal: spacing.md,
-    fontSize: 12,
+    ...typography.caption,
     color: colors.textSecondary,
-    marginBottom: spacing.sm,
+    marginBottom: spacing.md,
   },
 
-  // All done
+  // All done banner
   allDoneBanner: {
-    marginHorizontal: spacing.md,
-    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#F0F7E4',
+    borderRadius: radius.card,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
     gap: 8,
-    backgroundColor: '#F0FAF0',
-    borderRadius: radius.button,
-    padding: 10,
+  },
+  allDoneIcon: {
+    fontSize: 18,
   },
   allDoneText: {
-    fontSize: 13,
-    fontWeight: '500',
+    ...typography.body,
     color: colors.green,
+    fontWeight: '600',
+    flex: 1,
   },
 
   // Pillar cards
   pillarCard: {
-    marginHorizontal: spacing.md,
-    marginBottom: 8,
     backgroundColor: colors.sand,
-    borderRadius: 16,
-    padding: 14,
+    borderRadius: radius.card,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  pillarCardDone: {
+    backgroundColor: '#F0F7E4',
+  },
+  pillarCardExpanded: {
+    borderColor: colors.teal,
+    backgroundColor: colors.white,
+  },
+  pillarTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  pillarCardDone: { opacity: 0.75 },
   pillarLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
     flex: 1,
+    gap: 12,
   },
-  check: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+  checkbox: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     borderWidth: 2,
     borderColor: colors.teal,
+    backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',
-    flexShrink: 0,
   },
-  checkDone: {
+  checkboxDone: {
     backgroundColor: colors.teal,
     borderColor: colors.teal,
   },
-  pillarName: {
+  checkmark: {
+    color: colors.white,
+    fontWeight: '700',
     fontSize: 14,
-    fontWeight: '600',
+  },
+  pillarInfo: {
+    flex: 1,
+  },
+  pillarName: {
+    ...typography.body,
     color: colors.textPrimary,
+    fontWeight: '600',
   },
   pillarNameDone: {
-    textDecorationLine: 'line-through',
     color: colors.textSecondary,
+    textDecorationLine: 'line-through',
   },
   pillarMeta: {
-    fontSize: 11,
+    ...typography.caption,
     color: colors.textSecondary,
-    marginTop: 1,
+    marginTop: 2,
+  },
+  arrow: {
+    fontSize: 22,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
+  arrowExpanded: {
+    color: colors.teal,
+    transform: [{ rotate: '90deg' }],
   },
   doneBadge: {
-    backgroundColor: colors.teal,
-    borderRadius: 99,
-    paddingVertical: 3,
-    paddingHorizontal: 9,
+    backgroundColor: '#F0F7E4',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
   },
   doneBadgeText: {
-    fontSize: 10,
+    ...typography.caption,
+    color: colors.green,
     fontWeight: '700',
+    fontSize: 12,
+  },
+
+  // Activity panel
+  activityPanel: {
+    marginTop: 14,
+  },
+  activityDivider: {
+    height: 1,
+    backgroundColor: colors.sand,
+    marginBottom: 12,
+  },
+  activityHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 10,
+  },
+  activityHeaderText: {
+    ...typography.caption,
+    color: colors.teal,
+    fontWeight: '700',
+    fontSize: 11,
+    letterSpacing: 0.5,
+  },
+
+  // Activity chips
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  activityChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(15, 164, 175, 0.1)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: radius.pill,
+    borderWidth: 1.5,
+    borderColor: 'transparent',
+    gap: 5,
+  },
+  activityChipSelected: {
+    backgroundColor: colors.teal,
+    borderColor: colors.teal,
+  },
+  chipEmoji: {
+    fontSize: 14,
+  },
+  chipLabel: {
+    ...typography.caption,
+    color: colors.textPrimary,
+    fontWeight: '500',
+    fontSize: 13,
+  },
+  chipLabelSelected: {
     color: colors.white,
   },
 
-  // Empty state
-  emptyState: {
-    marginHorizontal: spacing.md,
-    padding: spacing.xl,
-    backgroundColor: colors.sand,
-    borderRadius: radius.card,
-    alignItems: 'center',
-    gap: spacing.sm,
-  },
-  emptyTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  emptySub: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    textAlign: 'center',
-  },
-  emptyBtn: {
-    marginTop: spacing.sm,
+  // Log button
+  logBtn: {
     backgroundColor: colors.teal,
     borderRadius: radius.button,
-    paddingVertical: 12,
-    paddingHorizontal: spacing.lg,
+    padding: 14,
+    alignItems: 'center',
+    marginTop: 14,
   },
-  emptyBtnText: {
+  logBtnText: {
     color: colors.white,
     fontWeight: '700',
-    fontSize: 14,
+    fontSize: 15,
+  },
+
+  // Skip link
+  skipBtn: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  skipText: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    fontSize: 12,
+  },
+  skipLink: {
+    color: colors.teal,
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });
