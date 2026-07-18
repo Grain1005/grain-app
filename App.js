@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, ActivityIndicator, ScrollView, Platform } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from './theme';
 import { hasCompletedOnboarding } from './storage';
@@ -51,6 +51,9 @@ class ErrorBoundary extends React.Component {
 }
 
 function TabNavigator() {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom, 10);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -62,7 +65,8 @@ function TabNavigator() {
           borderTopColor: '#EEEDE6',
           borderTopWidth: 0.5,
           paddingTop: 8,
-          paddingBottom: 12,
+          paddingBottom: bottomPadding + 8,
+          height: 60 + bottomPadding,
           elevation: 8,
         },
         tabBarLabelStyle: {

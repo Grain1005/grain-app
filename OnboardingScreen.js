@@ -118,7 +118,7 @@ export default function OnboardingScreen({ onComplete }) {
   // ═══ Screen 0: Philosophy — Brick Pyramid ═══
   if (screen === 0) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safeBlue}>
         <View style={styles.screenTop}>
           <ProgressDots current={0} total={5} />
           <BrickPyramid />
@@ -387,6 +387,7 @@ export default function OnboardingScreen({ onComplete }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.white },
+  safeBlue: { flex: 1, backgroundColor: '#E8F6F7' },
 
   // Layout helpers
   screenTop: {
