@@ -38,16 +38,16 @@ const FEEDBACK_EMAIL = 'grainapp8@gmail.com';
 const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.grain.app';
 
 const PILLAR_OPTIONS = [
-  { id: 'ai',            label: 'AI & Technology', icon: 'hardware-chip-outline',  category: 'Career'        },
-  { id: 'career',        label: 'Career',           icon: 'briefcase-outline',      category: 'Career'        },
-  { id: 'business',      label: 'Business',         icon: 'trending-up-outline',    category: 'Career'        },
-  { id: 'health',        label: 'Health',           icon: 'fitness-outline',        category: 'Health'        },
-  { id: 'mindfulness',   label: 'Wellbeing',        icon: 'leaf-outline',           category: 'Wellbeing'     },
-  { id: 'learning',      label: 'Learning',         icon: 'book-outline',           category: 'Learning'      },
-  { id: 'relationships', label: 'Relationships',    icon: 'people-outline',         category: 'Relationships' },
-  { id: 'wealth',        label: 'Wealth',           icon: 'wallet-outline',         category: 'Wealth'        },
-  { id: 'leadership',    label: 'Leadership',       icon: 'star-outline',           category: 'Leadership'    },
-  { id: 'writing',       label: 'Writing',          icon: 'create-outline',         category: 'Writing'       },
+  { id: 'ai',            label: 'AI & Technology', icon: 'hardware-chip-outline',  category: 'AI & Technology' },
+  { id: 'career',        label: 'Career',           icon: 'briefcase-outline',      category: 'Career'          },
+  { id: 'business',      label: 'Business',         icon: 'trending-up-outline',    category: 'Business'        },
+  { id: 'bodymind',      label: 'Body & Mind',      icon: 'flower-outline',         category: 'Body & Mind'     },
+  { id: 'learning',      label: 'Learning',         icon: 'book-outline',           category: 'Learning'        },
+  { id: 'relationships', label: 'Relationships',    icon: 'people-outline',         category: 'Relationships'   },
+  { id: 'wealth',        label: 'Wealth',           icon: 'wallet-outline',         category: 'Wealth'          },
+  { id: 'leadership',    label: 'Leadership',       icon: 'star-outline',           category: 'Leadership'      },
+  { id: 'writing',       label: 'Writing',          icon: 'create-outline',         category: 'Writing'         },
+  { id: 'creative',      label: 'Creative',         icon: 'color-palette-outline',  category: 'Creative'        },
 ];
 
 const TIME_OPTIONS = [

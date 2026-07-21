@@ -17,6 +17,13 @@ import OnboardingScreen from './OnboardingScreen';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+// Per-tab brand colors (icon + label light up in this color when active)
+const TAB_COLORS = {
+  Home: colors.teal,          // #0FA4AF
+  Pillars: colors.coral,      // #E64833
+  Dashboard: colors.warmOrange, // #D9822B
+};
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -58,7 +65,7 @@ function TabNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.teal,
+        tabBarActiveTintColor: TAB_COLORS[route.name] || colors.teal,
         tabBarInactiveTintColor: '#9B9891',
         tabBarStyle: {
           backgroundColor: colors.white,

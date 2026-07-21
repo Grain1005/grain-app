@@ -164,6 +164,9 @@ export default function HomeScreen({ navigation }) {
   const totalCount = pillars.length;
   const allDone = totalCount > 0 && doneCount >= totalCount;
 
+  // First-run state: user has never logged anything
+  const isFirstRun = pillars.length > 0 && Object.keys(logs).length === 0;
+
   const streakLabel = streak === 0 ? 'Start today!' : streak === 1 ? 'Keep going!' : 'On fire!';
 
   return (
@@ -225,7 +228,22 @@ export default function HomeScreen({ navigation }) {
 
         {/* Today's Pillars */}
         <Text style={styles.sectionTitle}>Today's Pillars</Text>
-        <Text style={styles.sectionSub}>Tap a pillar to see ideas & log your session</Text>
+        {!isFirstRun && (
+          <Text style={styles.sectionSub}>Tap a pillar to see ideas & log your session</Text>
+        )}
+
+        {/* First-run coaching banner — disappears forever after first log */}
+        {isFirstRun && (
+          <View style={styles.firstRunBanner}>
+            <Text style={styles.firstRunIcon}>👋</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.firstRunTitle}>Welcome to Grain!</Text>
+              <Text style={styles.firstRunText}>
+                Tap any pillar below to invest your first 8 minutes.
+              </Text>
+            </View>
+          </View>
+        )}
 
         {allDone && (
           <View style={styles.allDoneBanner}>
@@ -468,6 +486,34 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textSecondary,
     marginBottom: spacing.md,
+  },
+
+  // First-run coaching banner
+  firstRunBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F9FA',
+    borderRadius: radius.card,
+    padding: spacing.md,
+    marginTop: spacing.sm,
+    marginBottom: spacing.md,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: '#C5E8EA',
+  },
+  firstRunIcon: {
+    fontSize: 22,
+  },
+  firstRunTitle: {
+    ...typography.body,
+    color: colors.teal,
+    fontWeight: '700',
+    marginBottom: 2,
+  },
+  firstRunText: {
+    ...typography.caption,
+    color: colors.textPrimary,
+    lineHeight: 18,
   },
 
   // All done banner

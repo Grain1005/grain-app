@@ -21,16 +21,16 @@ import {
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 const PILLAR_OPTIONS = [
-  { id: 'ai',            label: 'AI & Technology', icon: 'hardware-chip-outline',  category: 'Career'        },
-  { id: 'career',        label: 'Career',           icon: 'briefcase-outline',      category: 'Career'        },
-  { id: 'business',      label: 'Business',         icon: 'trending-up-outline',    category: 'Career'        },
-  { id: 'health',        label: 'Health',           icon: 'fitness-outline',        category: 'Health'        },
-  { id: 'mindfulness',   label: 'Wellbeing',        icon: 'leaf-outline',           category: 'Wellbeing'     },
-  { id: 'learning',      label: 'Learning',         icon: 'book-outline',           category: 'Learning'      },
-  { id: 'relationships', label: 'Relationships',    icon: 'people-outline',         category: 'Relationships' },
-  { id: 'wealth',        label: 'Wealth',           icon: 'wallet-outline',         category: 'Wealth'        },
-  { id: 'leadership',    label: 'Leadership',       icon: 'star-outline',           category: 'Leadership'    },
-  { id: 'writing',       label: 'Writing',          icon: 'create-outline',         category: 'Writing'       },
+  { id: 'ai',            label: 'AI & Technology', icon: 'hardware-chip-outline',  category: 'AI & Technology' },
+  { id: 'career',        label: 'Career',           icon: 'briefcase-outline',      category: 'Career'          },
+  { id: 'business',      label: 'Business',         icon: 'trending-up-outline',    category: 'Business'        },
+  { id: 'bodymind',      label: 'Body & Mind',      icon: 'flower-outline',         category: 'Body & Mind'     },
+  { id: 'learning',      label: 'Learning',         icon: 'book-outline',           category: 'Learning'        },
+  { id: 'relationships', label: 'Relationships',    icon: 'people-outline',         category: 'Relationships'   },
+  { id: 'wealth',        label: 'Wealth',           icon: 'wallet-outline',         category: 'Wealth'          },
+  { id: 'leadership',    label: 'Leadership',       icon: 'star-outline',           category: 'Leadership'      },
+  { id: 'writing',       label: 'Writing',          icon: 'create-outline',         category: 'Writing'         },
+  { id: 'creative',      label: 'Creative',         icon: 'color-palette-outline',  category: 'Creative'        },
 ];
 
 // Brick Pyramid
@@ -185,9 +185,9 @@ export default function OnboardingScreen({ onComplete }) {
               </View>
               <View style={styles.outcomeItem}>
                 <View style={styles.outcomeCircle}>
-                  <Ionicons name="fitness-outline" size={18} color={colors.teal} />
+                  <Ionicons name="flower-outline" size={18} color={colors.teal} />
                 </View>
-                <Text style={styles.outcomeLabel}>Health</Text>
+                <Text style={styles.outcomeLabel}>Body & Mind</Text>
               </View>
               <View style={styles.outcomeItem}>
                 <View style={styles.outcomeCircle}>
@@ -370,6 +370,14 @@ export default function OnboardingScreen({ onComplete }) {
                 </View>
               );
             })}
+          </View>
+
+          {/* Nudge for what to do next */}
+          <View style={styles.nextStepHint}>
+            <Ionicons name="hand-left-outline" size={14} color={colors.teal} />
+            <Text style={styles.nextStepText}>
+              Next: tap any pillar to log your first 8 minutes.
+            </Text>
           </View>
         </View>
         <View style={styles.btnWrap}>
@@ -825,5 +833,22 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: colors.teal,
+  },
+  nextStepHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: '#E8F9FA',
+    borderRadius: radius.pill,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    marginTop: spacing.md,
+  },
+  nextStepText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.teal,
+    textAlign: 'center',
+    flexShrink: 1,
   },
 });
