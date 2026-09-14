@@ -15,7 +15,7 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0FA4AF"
       },
-      "package": "com.grain.app"
+      "package": "com.grain.dailyapp"
     },
     "platforms": [
       "android"
