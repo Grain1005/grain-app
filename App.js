@@ -7,7 +7,8 @@ import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-cont
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from './theme';
 import { hasCompletedOnboarding } from './storage';
-import { trackAppOpened, trackTabViewed } from './analytics';
+import { trackAppOpened, trackTabViewed, trackReminderSynced } from './analytics';
+import { syncReminderOnLaunch } from './notifications';
 import HomeScreen from './HomeScreen';
 import PillarsScreen from './PillarsScreen';
 import DashboardScreen from './DashboardScreen';
@@ -121,6 +122,12 @@ export default function App() {
         const complete = await hasCompletedOnboarding();
         setOnboardingComplete(complete);
         trackAppOpened();
+        // Re-check the daily reminder in the background; never blocks app start
+        syncReminderOnLaunch().then((result) => {
+          if (result === 'rescheduled' || result === 'no_permission' || result === 'error') {
+            trackReminderSynced(result);
+          }
+        });
       } catch (e) {
         console.log('App init error:', e);
         setInitError(e);

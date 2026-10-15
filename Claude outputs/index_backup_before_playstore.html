@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grain — Invest 8 minutes in yourself</title>
+<meta name="description" content="Grain is a habit app built for sustainable progress. No all-or-nothing routines. Just a small, intentional investment in yourself, every day.">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+<link rel="shortcut icon" href="favicon.ico">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --teal: #0fa4af;
+  --teal-dark: #0d8f99;
+  --teal-light: #e6f5f7;
+  --gold: #ffd700;
+  --gold-light: #fff8dc;
+  --dark: #2d3436;
+  --gray: #636e72;
+  --light-gray: #f5f6f8;
+  --white: #ffffff;
+  --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--dark);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  padding: 18px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+.navbar.scrolled {
+  background: rgba(15, 164, 175, 0.97);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+  backdrop-filter: blur(10px);
+}
+
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: white;
+}
+
+.navbar-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.navbar-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.navbar-brand-text {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: white;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  list-style: none;
+}
+
+.navbar-links a {
+  color: rgba(255,255,255,0.9);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 400;
+  transition: color 0.2s;
+}
+
+.navbar-links a:hover {
+  color: white;
+}
+
+.navbar-cta {
+  background: var(--gold) !important;
+  color: var(--dark) !important;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 600 !important;
+  font-size: 15px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.navbar-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(240,168,48,0.4);
+}
+
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
+}
+
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: white;
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0d9299 0%, #0fa4af 35%, #1fb5be 65%, #30c2c9 100%);
+  display: flex;
+  align-items: center;
+  padding: 120px 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 60px;
+}
+
+.hero-left {
+  color: white;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.12);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 40px;
+}
+
+.hero-badge-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+.hero-title {
+  font-family: var(--serif);
+  font-size: clamp(56px, 7vw, 80px);
+  font-weight: 700;
+  line-height: 1.05;
+  margin-bottom: 24px;
+  color: white;
+}
+
+.hero-subtitle {
+  font-size: 22px;
+  font-weight: 400;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,0.95);
+}
+
+.hero-tagline {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-style: italic;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 40px;
+}
+
+.hero-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold);
+  color: var(--dark);
+  padding: 16px 36px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(240,168,48,0.4);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: white;
+  padding: 16px 36px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.btn-secondary:hover {
+  border-color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.08);
+}
+
+/* Heatmap Grid */
+.hero-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.heatmap-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 6px;
+  max-width: 480px;
+  width: 100%;
+}
+
+.heatmap-cell {
+  aspect-ratio: 1;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.15);
+  transition: background 0.4s, transform 0.3s;
+}
+
+.heatmap-cell.filled {
+  background: rgba(255,255,255,0.85);
+}
+
+.heatmap-cell.gold {
+  background: var(--gold);
+}
+
+.heatmap-cell:hover {
+  transform: scale(1.1);
+}
+
+.heatmap-caption {
+  font-family: var(--serif);
+  font-style: italic;
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  margin-top: 16px;
+  text-align: right;
+}
+
+/* ===== SECTIONS COMMON ===== */
+.section {
+  padding: 100px 48px;
+}
+
+.section-label {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--teal);
+  margin-bottom: 16px;
+}
+
+.section-heading {
+  font-family: var(--serif);
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--dark);
+  margin-bottom: 20px;
+}
+
+.section-desc {
+  font-size: 17px;
+  color: var(--gray);
+  line-height: 1.7;
+  max-width: 680px;
+}
+
+.section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ===== THE IDEA ===== */
+.idea-section {
+  background: white;
+}
+
+.idea-section .section-heading {
+  font-size: clamp(28px, 3.5vw, 42px);
+  max-width: 720px;
+}
+
+.idea-subtitle {
+  font-family: var(--sans);
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--dark);
+  margin-top: 20px;
+  margin-bottom: 28px;
+  line-height: 1.6;
+}
+
+.idea-then {
+  font-size: 16px;
+  color: var(--gray);
+  margin-bottom: 24px;
+}
+
+.idea-blocks {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  max-width: 720px;
+  margin-top: 8px;
+}
+
+.idea-block {
+  padding: 20px 24px;
+  border-left: 3px solid var(--teal);
+  text-align: left;
+}
+
+.idea-block-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--dark);
+  margin-bottom: 4px;
+}
+
+.idea-block-desc {
+  font-size: 15px;
+  color: var(--gray);
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .idea-blocks {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== PILLARS ===== */
+.pillars-section {
+  background: white;
+}
+
+.pillars-desc {
+  font-size: 17px;
+  color: var(--gray);
+  max-width: 600px;
+  margin-bottom: 48px;
+}
+
+.pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.pillar-card {
+  border: 1.5px solid #e8ecee;
+  border-radius: 14px;
+  padding: 28px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  position: relative;
+}
+
+.pillar-card:hover {
+  border-color: var(--teal);
+  box-shadow: 0 4px 20px rgba(15,164,175,0.08);
+  transform: translateY(-2px);
+}
+
+.pillar-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--teal-light);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  color: var(--teal);
+  font-size: 20px;
+}
+
+.pillar-number {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  font-size: 13px;
+  color: var(--teal);
+  font-weight: 500;
+}
+
+.pillar-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 6px;
+}
+
+.pillar-desc {
+  font-size: 14px;
+  color: var(--gray);
+}
+
+.pillars-footnote {
+  text-align: center;
+  font-size: 15px;
+  color: var(--gray);
+  margin-top: 12px;
+}
+
+.pillars-footnote strong {
+  color: var(--teal);
+  font-weight: 600;
+}
+
+/* ===== WHO GRAIN IS FOR ===== */
+.audience-section {
+  background: var(--light-gray);
+}
+
+.audience-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 48px;
+}
+
+.audience-card {
+  background: white;
+  padding: 28px 32px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.audience-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+}
+
+.audience-icon {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  background: var(--light-gray);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--teal);
+}
+
+.audience-text {
+  font-size: 15px;
+  color: var(--dark);
+  line-height: 1.5;
+}
+
+/* ===== HOW IT WORKS ===== */
+.how-section {
+  background: white;
+}
+
+.timeline {
+  max-width: 680px;
+  margin: 60px auto 0;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #e0e6e8;
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 60px;
+  position: relative;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-item:nth-child(odd) {
+  flex-direction: row;
+  text-align: right;
+  padding-right: calc(50% + 30px);
+}
+
+.timeline-item:nth-child(even) {
+  flex-direction: row-reverse;
+  text-align: left;
+  padding-left: calc(50% + 30px);
+}
+
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  background: var(--teal);
+  border-radius: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+}
+
+.timeline-number {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--teal);
+  margin-bottom: 6px;
+  font-family: var(--sans);
+}
+
+.timeline-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.timeline-desc {
+  font-size: 15px;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+/* ===== WHY 8 MINUTES ===== */
+.why-section {
+  background: linear-gradient(135deg, #0d9299 0%, #0fa4af 35%, #1fb5be 65%, #30c2c9 100%);
+  text-align: center;
+  padding: 120px 48px;
+}
+
+.why-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.12);
+  padding: 8px 20px;
+  border-radius: 50px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.9);
+  margin-bottom: 40px;
+}
+
+.why-heading {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 500;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 12px;
+}
+
+.why-heading em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.why-sub {
+  font-size: 17px;
+  color: rgba(255,255,255,0.8);
+  max-width: 600px;
+  margin: 24px auto 0;
+}
+
+/* ===== BUILT WITH INTENTION ===== */
+.intention-section {
+  background: white;
+}
+
+.intention-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.intention-values {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.intention-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px 28px;
+  border: 1.5px solid #e8ecee;
+  border-radius: 14px;
+  transition: border-color 0.2s;
+}
+
+.intention-card:hover {
+  border-color: var(--teal);
+}
+
+.intention-icon {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  background: var(--gold-light);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 18px;
+}
+
+.intention-text {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--dark);
+}
+
+/* ===== FEATURES ===== */
+.features-section {
+  background: white;
+  border-top: 1px solid #f0f2f4;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  margin-top: 48px;
+  border: 1.5px solid #e8ecee;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.feature-card {
+  padding: 36px 32px;
+  border-right: 1.5px solid #e8ecee;
+  border-bottom: 1.5px solid #e8ecee;
+  transition: background 0.2s;
+}
+
+.feature-card:nth-child(3n) {
+  border-right: none;
+}
+
+.feature-card:nth-child(n+4) {
+  border-bottom: none;
+}
+
+.feature-card:hover {
+  background: var(--light-gray);
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  background: var(--teal-light);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--teal);
+  font-size: 20px;
+}
+
+.feature-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 8px;
+}
+
+.feature-desc {
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.6;
+}
+
+/* ===== FOOTER CTA ===== */
+.footer-cta {
+  background: linear-gradient(135deg, #0d9299 0%, #0fa4af 35%, #1fb5be 65%, #30c2c9 100%);
+  text-align: center;
+  padding: 120px 48px 100px;
+}
+
+.footer-grain-icon {
+  font-size: 28px;
+  margin-bottom: 32px;
+  opacity: 0.6;
+}
+
+.footer-heading {
+  font-family: var(--serif);
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 500;
+  color: white;
+  line-height: 1.2;
+  margin-bottom: 24px;
+}
+
+.footer-heading em {
+  color: var(--gold);
+  font-style: italic;
+}
+
+.footer-sub {
+  font-size: 17px;
+  color: rgba(255,255,255,0.8);
+  max-width: 540px;
+  margin: 0 auto 40px;
+}
+
+.footer-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-note {
+  color: rgba(255,255,255,0.65);
+  font-size: 14px;
+}
+
+.qr-section {
+  margin-top: 48px;
+  text-align: center;
+}
+
+.qr-label {
+  color: rgba(255,255,255,0.8);
+  font-size: 15px;
+  margin-bottom: 16px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.qr-wrapper {
+  display: inline-block;
+  background: white;
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.qr-image {
+  display: block;
+  width: 160px;
+  height: 160px;
+}
+
+/* ===== INSTALL GUIDE ===== */
+.install-guide {
+  padding: 80px 48px;
+  background: var(--light-gray);
+  text-align: center;
+}
+
+.install-guide-heading {
+  font-family: var(--serif);
+  font-size: 36px;
+  color: var(--dark);
+  margin-bottom: 12px;
+}
+
+.install-guide-reassurance {
+  font-size: 17px;
+  color: var(--gray);
+  max-width: 640px;
+  margin: 0 auto 48px;
+  line-height: 1.7;
+}
+
+.install-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.install-step {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 32px 24px 28px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  text-align: center;
+  position: relative;
+}
+
+.install-step-number {
+  width: 40px;
+  height: 40px;
+  background: var(--teal);
+  color: white;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.install-dialog {
+  background: #f0f0f0;
+  border-radius: 16px;
+  padding: 20px 18px;
+  margin-bottom: 20px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  line-height: 1.5;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+.install-dialog-title {
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 8px;
+  color: #1a1a1a;
+}
+
+.install-dialog-icon {
+  font-size: 28px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.install-dialog-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 14px;
+  justify-content: flex-end;
+}
+
+.install-dialog-btn {
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: default;
+}
+
+.install-dialog-btn.secondary {
+  background: transparent;
+  color: #555;
+  border: 1.5px solid #ccc;
+}
+
+.install-dialog-btn.primary {
+  background: var(--teal);
+  color: white;
+}
+
+.install-dialog-btn.text-primary {
+  background: transparent;
+  color: var(--teal);
+  font-weight: 600;
+}
+
+.install-step-instruction {
+  font-size: 15px;
+  color: var(--dark);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.install-step-instruction strong {
+  color: var(--teal);
+}
+
+@media (max-width: 768px) {
+  .install-steps {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+  .install-guide {
+    padding: 60px 20px;
+  }
+  .install-guide-heading {
+    font-size: 28px;
+  }
+}
+
+/* ===== ACTUAL FOOTER ===== */
+.footer {
+  background: #094f57;
+  text-align: center;
+  padding: 28px 48px;
+  color: rgba(255,255,255,0.5);
+  font-size: 13px;
+}
+
+/* ===== ANIMATIONS ===== */
+.fade-up {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .navbar { padding: 16px 32px; }
+  .section { padding: 80px 32px; }
+  .hero { padding: 100px 32px 60px; }
+  .pillars-grid { grid-template-columns: repeat(3, 1fr); }
+  .audience-grid { grid-template-columns: repeat(2, 1fr); }
+  .intention-inner { gap: 48px; }
+}
+
+@media (max-width: 768px) {
+  .navbar { padding: 14px 20px; }
+  .navbar-links {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 164, 175, 0.98);
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    z-index: 999;
+  }
+  .navbar-links.open { display: flex; }
+  .navbar-links a { font-size: 20px; }
+  .hamburger { display: flex; z-index: 1001; }
+  .hamburger.open span:first-child { transform: rotate(45deg) translate(5px, 5px); }
+  .hamburger.open span:nth-child(2) { opacity: 0; }
+  .hamburger.open span:last-child { transform: rotate(-45deg) translate(5px, -5px); }
+
+  .hero { min-height: auto; padding: 100px 20px 60px; }
+  .hero-content { grid-template-columns: 1fr; gap: 48px; }
+  .hero-right { align-items: center; }
+  .heatmap-grid { max-width: 360px; }
+
+  .section { padding: 64px 20px; }
+
+  .pillars-grid { grid-template-columns: 1fr; }
+
+  .audience-grid { grid-template-columns: 1fr; }
+
+  .timeline-item:nth-child(odd) {
+    padding-right: 0;
+    padding-left: calc(50% + 24px);
+    text-align: left;
+    flex-direction: row-reverse;
+  }
+
+  .intention-inner { grid-template-columns: 1fr; gap: 40px; }
+
+  .features-grid { grid-template-columns: 1fr; }
+  .feature-card { border-right: none; border-bottom: 1.5px solid #e8ecee; }
+  .feature-card:last-child { border-bottom: none; }
+  .feature-card:nth-child(n+4) { border-bottom: 1.5px solid #e8ecee; }
+  .feature-card:last-child { border-bottom: none; }
+
+  .why-section, .footer-cta { padding: 80px 20px; }
+}
+
+@media (max-width: 480px) {
+  .hero-buttons { flex-direction: column; width: 100%; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+  .heatmap-grid { grid-template-columns: repeat(8, 1fr); max-width: 280px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <a href="#" class="navbar-brand">
+    <div class="navbar-logo"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAF90lEQVR42u3bX4hcVx3A8e8598/83d2Z2f9/mqzpxkTbTdhmu21Ii1BbShUfSiuiIOKDCn0SqeKT4kOhCIKgViGC1j9PCkVQlELbaJtIm5C0KWG3zW5M0pDNzv7JZHd2Z+bee87xYWbHXU19qLvShN/vYeDcOecH9zPnnN+5F0Z1/OYFh8QHDi0EAiiAAiiAEgIogAIogBICKIACKIASAiiAAiiAEgIogAIogBICKIACKIASAiiAAiiAEgIogAJ424W/k8kVoJVCbbrmAOscbptyAxjnbj9ArRTGOipRBNaCUoBDaU3e91s3/0HxYudYjWI8pcgH/u0F6ClFNU5oC3y+sGcX93WXcMBqknB6scKrc/PUEoOn1H/MRLVppr5fO3GOUhjyo/vGOHu9ws+mLpD29E1zuVsNcAPvns4iP39gnJG2PM+cneStxet0Z9I8e2gUrRSH//QSa4nB35iJChSK2Fo0Ck8rnHNE1qJQBFq1Zm01ivnUUD9f3jvMSpzw/PlLGOfQG6ma/RJr0aoxzu7QMve3e8+rW0tPJsXvHzrMYDbDV4+f4ujb7xBm00T1iJMLS5z8zMO0BwHVOMECkW3cXGwtnekQ4xzVOEGhGMhmMM4yt14nMpb2MKAt8Hlltsx3z5xjsrJMzSRkfJ/YWhLrsDisc5RSIbXEUDOGrO/jdgDR3+7ZV4kivrZvD4PZDDfimFeuzZPPZ0lpjQoCLlXX+MrxUyzVIz7R183XP/5RSqmQ18oLaODJ4SFOlBf56dQMP5g4yMxylf5shozn8dzUNM+fv0h/LsOzh0bpSqe4p7PIi1fnGCsV+PaB/RTDkFMLSwSe5rHBPubX63zjjbd4bW6BXOBv+0zcgWOMYrTQgQMq9ZiVOEE1K+VyHFNNEn41NUNkLC/Pljm5sMR4V5Gn9t/Jm8sVXjyz8f45F+OUUqFHD0yzr3dJa5UV/nl9EUeGejl0cFeOsKAV2fLnF68znhXkc/tuYNfT1/iJ5MzHCwVeObQ3bdWEdHNzahxWGl8aqX4/vgBhvM5Qq354bl3efHSFSpRjHGOE+VFfvHOBdJBwJmlCtdq64x3FvnO/WOtAuSAg6UCJ2bLrXE3orhRlY1lqR5hnOPY7Dx/vXiFxFmsc/Rl0rSHPnVjb1q4Plwz0Dmml6sooD0IyPp+o5IqOPruBcZKBR4b6qM/m0Y5R+BpPKVYWK/j+x4doc/l6ipP37WP459+iEcGerlQWSZxrlWRFRDoxriNIqHUv64Z5/ACn9ym49L/cmz6vwFaIBP4/O4f71FNEkqpkNFiBytrNerGcm7hOpdX15rzEpy1VOOExDkiY0jimMQ6ckHAF0d2k1jHt06d5bdnzjFfWyexjpU4wVnLSrNv3MyxOVfdWEySsBInrT4rcXwLADpHxvM4v1zlS397g6V6xNEj4zw+MszefI4n7tzNwVKByFjma3X68jkmuor4SrG/0MZEXw8AdWOYWa7ia8X3xu7imw9OcLinC18rjvR2MtCW54HeRnsgm+H+nhL9+Rz3NnN9rNDGRwodjbZW3JHL8mBv946cCdVO/FfOU4obUcxIe57P79nFaLGDteYe9uZihZdmy0xWbjDR3clnh4eIrcXXmmu1dZ6bmiGxll25LE/fvY/BXIY/XL6KBva2t6EVvHD5Kg8P9JDzGlv41VqN1+cXeWL3EJG1BFrz8myZA8UOOlMpUDBXW+fHk9P427wHqp36s6GnFDVjqMUJKEWgNbE1AKQ9n7TvUW9931jTSinaw6a05X+AfQjiLUFXCX4IkkzGZabPAO+GfYg/wAA/wgKUDfgJ12qDUSIgN6wAAAABJRU5ErkJggg==" alt="Grain"></div>
+    <span class="navbar-brand-text">Grain</span>
+  </a>
+  <ul class="navbar-links" id="navLinks">
+    <li><a href="#pillars">Pillars</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#why">Why 8 minutes</a></li>
+    <li><a href="#features">Features</a></li>
+    <li><a href="/app/" class="navbar-cta" style="background: white !important; color: var(--teal) !important;">Try Grain on Web</a></li>
+    <li><a href="https://github.com/Grain1005/grain-app/releases/download/v1.0.0/Grain-v1.0.0.apk" class="navbar-cta">Download for Android</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <div class="hero-content">
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="hero-badge-dot"></span>
+        Invest in yourself every day
+      </div>
+      <h1 class="hero-title">Grain</h1>
+      <p class="hero-subtitle">Invest 8 minutes in yourself.</p>
+      <p class="hero-tagline">Small grains. Massive results.</p>
+      <div class="hero-buttons">
+        <a href="/app/" class="btn-primary">Try Grain on Web &mdash; Free <span>&#10132;</span></a>
+        <a href="https://github.com/Grain1005/grain-app/releases/download/v1.0.0/Grain-v1.0.0.apk" class="btn-secondary">Download for Android <span>&#8595;</span></a>
+      </div>
+      <p style="color: rgba(255,255,255,0.7); font-size: 13px; margin-top: 12px; letter-spacing: 0.3px;">Now available on Web &bull; Android &bull; Coming soon to Play Store &amp; iOS</p>
+    </div>
+    <div class="hero-right">
+      <div class="heatmap-grid" id="heatmapGrid"></div>
+      <p class="heatmap-caption">Every square is an investment in yourself.</p>
+    </div>
+  </div>
+</section>
+
+<!-- THE IDEA -->
+<section class="section idea-section fade-up">
+  <div class="section-inner">
+    <p class="section-label">THE IDEA</p>
+    <h2 class="section-heading">Small actions. Meaningful progress.</h2>
+    <p class="idea-subtitle">Just 8 minutes a day can move you closer to the person you want to become.</p>
+    <div class="idea-blocks">
+      <div class="idea-block">
+        <p class="idea-block-title">Learn something.</p>
+        <p class="idea-block-desc">Read a chapter. Practice an AI skill. Learn a new word.</p>
+      </div>
+      <div class="idea-block">
+        <p class="idea-block-title">Build something.</p>
+        <p class="idea-block-desc">Work on your career. Grow your business. Create something that matters.</p>
+      </div>
+      <div class="idea-block">
+        <p class="idea-block-title">Take care of yourself.</p>
+        <p class="idea-block-desc">Walk. Stretch. Breathe. Reset.</p>
+      </div>
+      <div class="idea-block">
+        <p class="idea-block-title">Create space.</p>
+        <p class="idea-block-desc">Declutter one shelf. Journal. Organize one thing.</p>
+      </div>
+      <div class="idea-block">
+        <p class="idea-block-title">Grow your wealth.</p>
+        <p class="idea-block-desc">Contribute to your savings. Review one expense. Build one financial habit.</p>
+      </div>
+      <div class="idea-block">
+        <p class="idea-block-title">Nurture relationships.</p>
+        <p class="idea-block-desc">Send a message. Call a friend. Show up for someone.</p>
+      </div>
+    </div>
+    <p class="section-desc" style="margin-top: 32px;">Grain is a habit app built for sustainable progress. No all-or-nothing routines. Just a small, intentional investment in yourself, every day.</p>
+  </div>
+</section>
+
+<!-- PILLARS -->
+<section class="section pillars-section fade-up" id="pillars">
+  <div class="section-inner">
+    <p class="section-label">WHAT ARE PILLARS?</p>
+    <h2 class="section-heading">The areas of your life you're growing in.</h2>
+    <p class="pillars-desc">Pick up to three. Focus your daily 8 minutes where it matters most to you right now.</p>
+    <div class="pillars-grid">
+      <div class="pillar-card">
+        <span class="pillar-number">1</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 21h8M12 18v3"/></svg>
+        </div>
+        <h3 class="pillar-name">AI & Technology</h3>
+        <p class="pillar-desc">Build skills that actually get used.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">2</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        </div>
+        <h3 class="pillar-name">Career</h3>
+        <p class="pillar-desc">Get closer to that promotion.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">3</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="pillar-name">Business</h3>
+        <p class="pillar-desc">Grow your side project or venture.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">4</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 5a7 7 0 017 7M12 5a7 7 0 00-7 7M5 12a7 7 0 007 7M19 12a7 7 0 01-7 7"/><circle cx="12" cy="5" r="1.2" fill="currentColor"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/><circle cx="5" cy="12" r="1.2" fill="currentColor"/><circle cx="19" cy="12" r="1.2" fill="currentColor"/></svg>
+        </div>
+        <h3 class="pillar-name">Body & Mind</h3>
+        <p class="pillar-desc">Move, meditate, sleep, breathe.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">5</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        </div>
+        <h3 class="pillar-name">Learning</h3>
+        <p class="pillar-desc">Read, study, grow your knowledge.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">6</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><circle cx="15" cy="8" r="3.5"/><path d="M3 20c0-3 2.7-5.5 6-5.5s6 2.5 6 5.5"/><path d="M15 14.5c3.3 0 6 2.5 6 5.5"/></svg>
+        </div>
+        <h3 class="pillar-name">Relationships</h3>
+        <p class="pillar-desc">Deepen the bonds that matter most.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">7</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/><path d="M7 15h3"/></svg>
+        </div>
+        <h3 class="pillar-name">Wealth</h3>
+        <p class="pillar-desc">Get money on your side.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">8</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h3 class="pillar-name">Leadership</h3>
+        <p class="pillar-desc">Become the person others follow.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">9</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        </div>
+        <h3 class="pillar-name">Writing</h3>
+        <p class="pillar-desc">Journal, blog, draft, create with words.</p>
+      </div>
+      <div class="pillar-card">
+        <span class="pillar-number">10</span>
+        <div class="pillar-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r="2.5"/><circle cx="9" cy="13" r="4"/><path d="M15.5 13a4.5 4.5 0 11-1 2"/></svg>
+        </div>
+        <h3 class="pillar-name">Creative</h3>
+        <p class="pillar-desc">Paint, sing, dance, design, photograph.</p>
+      </div>
+    </div>
+    <p class="pillars-footnote">Choose up to <strong>3 pillars</strong> during onboarding &mdash; enough to grow, not so much you burn out.</p>
+  </div>
+</section>
+
+<!-- WHO GRAIN IS FOR -->
+<section class="section audience-section fade-up">
+  <div class="section-inner">
+    <p class="section-label">WHO GRAIN IS FOR</p>
+    <h2 class="section-heading">Made for the quietly committed.</h2>
+    <div class="audience-grid">
+      <div class="audience-card">
+        <div class="audience-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        </div>
+        <p class="audience-text">The professional tired of hoping for promotion &mdash; ready to actually work for it.</p>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        </div>
+        <p class="audience-text">The learner building vocabulary one word a day.</p>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        </div>
+        <p class="audience-text">The working parent squeezing 5 minutes of home organization into a busy morning.</p>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        </div>
+        <p class="audience-text">The professional learning AI so they don't get left behind.</p>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        </div>
+        <p class="audience-text">The individual starting to build wealth &mdash; one small financial habit at a time.</p>
+      </div>
+      <div class="audience-card">
+        <div class="audience-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/></svg>
+        </div>
+        <p class="audience-text">The creator who writes, draws, or builds a little every day &mdash; before the world gets loud.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section how-section fade-up" id="how">
+  <div class="section-inner">
+    <p class="section-label">HOW IT WORKS</p>
+    <h2 class="section-heading">Five quiet steps. One daily ritual.</h2>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div>
+          <p class="timeline-number">01</p>
+          <h3 class="timeline-title">Pick up to 3 pillars</h3>
+          <p class="timeline-desc">During onboarding, choose the areas of your life you're serious about improving.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div>
+          <p class="timeline-number">02</p>
+          <h3 class="timeline-title">Log 8 minutes a day</h3>
+          <p class="timeline-desc">Per pillar. Small enough to say yes to, large enough to matter.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div>
+          <p class="timeline-number">03</p>
+          <h3 class="timeline-title">Watch your streak grow</h3>
+          <p class="timeline-desc">Stay motivated by seeing your consistency build, one day at a time.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div>
+          <p class="timeline-number">04</p>
+          <h3 class="timeline-title">See progress in a heatmap</h3>
+          <p class="timeline-desc">Your calendar fills in as you show up. The compound effect, made visible.</p>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot"></div>
+        <div>
+          <p class="timeline-number">05</p>
+          <h3 class="timeline-title">Come back tomorrow</h3>
+          <p class="timeline-desc">That's it. No guilt, no overwhelm &mdash; just the next small grain.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHY 8 MINUTES -->
+<section class="why-section fade-up" id="why">
+  <div class="section-inner">
+    <div class="why-badge">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      Why 8 minutes?
+    </div>
+    <h2 class="why-heading">Small enough to say yes to.<br><em>Large enough to matter.</em></h2>
+    <p class="why-sub">It's the difference between "I'll get to it someday" and "I did it today."</p>
+  </div>
+</section>
+
+<!-- BUILT WITH INTENTION -->
+<section class="section intention-section fade-up">
+  <div class="section-inner">
+    <div class="intention-inner">
+      <div>
+        <p class="section-label">BUILT WITH INTENTION</p>
+        <h2 class="section-heading">Just you, your pillars, and the compound effect.</h2>
+      </div>
+      <div class="intention-values">
+        <div class="intention-card">
+          <div class="intention-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <span class="intention-text">No ads</span>
+        </div>
+        <div class="intention-card">
+          <div class="intention-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <span class="intention-text">No dark patterns</span>
+        </div>
+        <div class="intention-card">
+          <div class="intention-icon">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+          </div>
+          <span class="intention-text">No guilt trips</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section features-section fade-up" id="features">
+  <div class="section-inner">
+    <p class="section-label">FEATURES</p>
+    <h2 class="section-heading">Everything you need. Nothing you don't.</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/></svg>
+        </div>
+        <h3 class="feature-name">Daily Habit Tracker</h3>
+        <p class="feature-desc">Build habits that fit into your busy schedule.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <h3 class="feature-name">Streak Tracking</h3>
+        <p class="feature-desc">Stay motivated by seeing your consistency grow every day.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15h6"/></svg>
+        </div>
+        <h3 class="feature-name">Daily Notes & Reflections</h3>
+        <p class="feature-desc">Capture ideas, lessons, and small wins.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        </div>
+        <h3 class="feature-name">Smart Reminders</h3>
+        <p class="feature-desc">Never miss your daily investment.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <h3 class="feature-name">Private by Default</h3>
+        <p class="feature-desc">Your data stays on your device.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><path d="M22 4L12 14.01l-3-3"/></svg>
+        </div>
+        <h3 class="feature-name">Calm & Simple Experience</h3>
+        <p class="feature-desc">No clutter. No overwhelming routines. Just consistent progress.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER CTA -->
+<section class="footer-cta fade-up" id="download">
+  <div class="section-inner">
+    <div class="footer-grain-icon">&#127793;</div>
+    <h2 class="footer-heading">Invest in yourself<br><em>every day.</em></h2>
+    <p class="footer-sub">Start with 8 minutes today. A month from now you'll have a habit. A year from now you'll have a different life.</p>
+    <div class="footer-buttons">
+      <a href="/app/" class="btn-primary" id="webAppBtn">Try Grain on Web &mdash; Free</a>
+      <a href="https://github.com/Grain1005/grain-app/releases/download/v1.0.0/Grain-v1.0.0.apk" class="btn-secondary" id="downloadBtn">Download for Android <span>&#8595;</span></a>
+    </div>
+    <p style="color: rgba(255,255,255,0.7); font-size: 15px; margin-top: 20px;">No ads. No guilt trips. No credit card.</p>
+    <p style="color: var(--gold); font-weight: 500; font-size: 14px; margin-top: 8px;">Coming soon to Google Play Store &amp; iOS</p>
+    <div class="qr-section">
+      <p class="qr-label">Or scan to download</p>
+      <div class="qr-wrapper">
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAhIAAAISCAIAAAAWX7HoAAANtUlEQVR4nO3dMZIjyXJAQQ5tD8CjUef5qPNovAGorkBL+29yczIS7a53oVAF9LMSAvHr8/n8GwD8a/799gkA8BLZACCQDQAC2QAgkA0AAtkAIJANAALZACCQDQAC2QAgkA0AAtkAIJANAALZACCQDQAC2QAgkA0AAtkAIJANAIK/dv74P/77f/6h05jif//rP3/7b9dX49aRb53V2rlznvm3O8697sx3dM7M+3vLzl3wtAFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQLA1Jb52axZ0bWfa0xz4n7Fzzuc+defmsXded+a3bO37prVn3oVz18rTBgCBbAAQyAYAgWwAEMgGAIFsABDIBgCBbAAQyAYAwcEp8bXv21S849Zk7PdNp784YT5zt/aOmb+YcMvM67zD0wYAgWwAEMgGAIFsABDIBgCBbAAQyAYAgWwAEMgGAMG1KfHvc2u6deb27FtH3nHuLsz85YKZU/HnzmrmXXiRpw0AAtkAIJANAALZACCQDQAC2QAgkA0AAtkAIJANAAJT4n/Irc3b53Zrr1/31vu9NX8+c85/7daO61ufWP4pnjYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgEA2AAiuTYmb5/y7czPGtyaB187tmj43gby2c51vnfParc/V2sxrtTbzrHZ42gAgkA0AAtkAIJANAALZACCQDQAC2QAgkA0AAtkAIDg4JX5rjvSWc9PLL+58vvW3O2ZuZV97cWr6llv77b+Ppw0AAtkAIJANAALZACCQDQAC2QAgkA0AAtkAIJANAIKtKfGfNoP64vt1zq+/7szfCJj5urfO+afxtAFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQHBwl/jaT9vre2t79s7VuDVFfM6L57zjxe3ot+axd67VzM/VuSvpaQOAQDYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgODalPjazsTmzAnzn3bkFyfbX5xP3jnyzNnmc9PaL+4DP3f3d47saQOAQDYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgGDolPjMzb3npkzPTfPOvJI7Xpzl3rnO3/eLCd+3h/ycmXPvnjYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgEA2AAh+fT6fQ4e+tSH51iz3uS3HM9/v2q3p9J/2ubp15J3XveXF3xeYydMGAIFsABDIBgCBbAAQyAYAgWwAEMgGAIFsABDIBgDB1pT4zMnnmbPNM9/ROTM3Ud+auJ75tztmfp5fvPtrM2fIPW0AEMgGAIFsABDIBgCBbAAQyAYAgWwAEMgGAIFsABD8dfsE/n8z5ypnTmzOnE9euzVjfM7OWc18RztufX9/2nd/7dz319MGAIFsABDIBgCBbAAQyAYAgWwAEMgGAIFsABDIBgDB1i7xtZnbpM+ZueX4nHNzszOnpm/d31tm7uU+d+QXd7bfmsb3tAFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQHBwSvyc75vIXZs5YT7zdW99Nr5vTnjmkc+97q3Pxsx5+zVPGwAEsgFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABH+dO/TMmcy1W9uGb022z7wLO168g+sj35rkv3Xknde9tQ/8+67GmqcNAALZACCQDQAC2QAgkA0AAtkAIJANAALZACCQDQCCg1PiMzcV78xGft+W8h23NkKv7ZzVzEn+mW79CsDarW/3uasx8zPpaQOAQDYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgGBrSnxngvHWfOOtqcuZO5DXdu7gzOnWW37a1bj1iZ35XVg797sG53jaACCQDQAC2QAgkA0AAtkAIJANAALZACCQDQAC2QAg+PX5fH77j79vn/Dai/vPZ84n3zqrc9P4Myf5v+9112Z+nnfM/O572gAgkA0AAtkAIJANAALZACCQDQAC2QAgkA0AAtkAIDg4JT5zjnRt5lbnF2duXzznHbe+CzPv0Yu/ifB9vwGxZkocgD9ENgAIZAOAQDYACGQDgEA2AAhkA4BANgAIZAOA4K/bJ/A7Zu58nnnkn7ZZ/dbf7lznmfui12693xePPPM/ww5PGwAEsgFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABFu7xNdmbgs/58V57HO+bz/2jplzwjN/bWHt1uveMvMXBDxtABDIBgCBbAAQyAYAgWwAEMgGAIFsABDIBgCBbAAQbO0SnzmTeWta+9ZW53Nu7dY+Z+Yk/9qtK3lre/aLr7t26//kuXfkaQOAQDYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgGBrSvzFvb4zJ1R3jnzOzEnvc5+rc5+NnXOe+X5vXatb/3Nm/gbErf8qnjYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgEA2AAi2psTP+b6J61tuTQLP/I2AtRen8W99F2Z+cr7v/8bM75GnDQAC2QAgkA0AAtkAIJANAALZACCQDQAC2QAgkA0AgoNT4jO3/t4ycxJ45mb1c9fq1mdj5lz0zP3YO2bubF87d53PvSNPGwAEsgFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABAenxL9v6nLtxa3dt2bXd7w423xrKv7cDPnauU/szLM697q3fm1hzdMGAIFsABDIBgCBbAAQyAYAgWwAEMgGAIFsABDIBgDB1pT4zK3dt6amv28WdOb8+czr/OIc+NqtefuZs9wz3TpnTxsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQCAbAAS/Pp/PoUN/37zujhc3Fe9wF/6MmTPkL37av++bcu7InjYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgEA2AAi2domf8+JM5tqt6dYdO2f14vt9ceP3jpmf9nN2XvfcRP3M2fU1TxsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQCAbAAQHd4nvmLnXd23mtOetTcXnzJw/f3GyfW3m1XjxyDtm/lfxtAFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQLC1S/zcjOKtSeCZM6gv7hKf+Y7OufV+Z+6aPmfmHPjMX1s499nwtAFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQLA1Jb42c3515m7emUd+cVZ/5t/OdGsu+sXrfOt1Z/7agqcNAALZACCQDQAC2QAgkA0AAtkAIJANAALZACCQDQCCrSnxnzYZu3PkmVOma+tzvjUnfM7MPfNrM3drz9wGP/P+vvhf1NMGAIFsABDIBgCBbAAQyAYAgWwAEMgGAIFsABDIBgDB1pS4XcR/xq3p1nOzvrfmZmceeeaE+blvKH/34n57TxsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQCAbAARbU+Jrt/ZF35qrNBn7d+fuwq091bd2Ta+PfGtO+Pvu4K0jv/h7GZ42AAhkA4BANgAIZAOAQDYACGQDgEA2AAhkA4BANgAIfn0+nysvPHOD7vfNvs68VufMfL+3PhtrMyf5b21lX5u50/vWdfa0AUAgGwAEsgFAIBsABLIBQCAbAASyAUAgGwAEsgFAcHCX+K2t3ecmRW9NIO/87cyZ253XnTnZ/uKc8Dm3ruSLu9Nf/H0BTxsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQCAbAAQHp8TXzm3BnbnFes3c+5/x4t71W5+rW3f/xeu8du4XMW7xtAFAIBsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQLA1JT5zrnLt1vzq2q2zmjmDes65ne07Zk7Ur92ax/5pd/DWLwisedoAIJANAALZACCQDQAC2QAgkA0AAtkAIJANAALZACDYmhJ/ccb4+zYVr82cir/1urfm/F/cb792aw585tT02ot3Yc3TBgCBbAAQyAYAgWwAEMgGAIFsABDIBgCBbAAQyAYAwdBd4rfcmiHfOfK5ydhz72jm7wvcuoOm4v8pM2fXd8y8zp42AAhkA4BANgAIZAOAQDYACGQDgEA2AAhkA4BANgAItqbE116cBP6+1z03Bz5zbnbHrWntmbumz03Fn/PivP3O6976DnraACCQDQAC2QAgkA0AAtkAIJANAALZACCQDQAC2QAg+PX5fH77j8/NGO8wGft3P22W+8X99rcmkGfeoxe/gzte3EPuaQOAQDYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgODgLvGf5ta058zJ2HOz3N83jb/zjr5vx/Wt3zV4kV3iADxANgAIZAOAQDYACGQDgEA2AAhkA4BANgAIZAOAwJR4MHN+dWfmduZW55lTxDM3b986qx0zf9dgbeaG81vfFE8bAASyAUAgGwAEsgFAIBsABLIBQCAbAASyAUAgGwAEvz6fz2//8cyp6bUXz3nt1jz2Tzvy2sxJ4HOvu2PmnP+Ld/8WTxsABLIBQCAbAASyAUAgGwAEsgFAIBsABLIBQCAbAAQHd4m/uDH4nHMTqi/uEp+5pXzHzBnjHTOv887n6tbdv3V/7RIHYATZACCQDQAC2QAgkA0AAtkAIJANAALZACCQDQCCrV3iAPw0njYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgEA2AAhkA4BANgAIZAOAQDYACGQDgEA2AAhkA4BANgAIZAOAQDYACP4PdNmuIJc7e48AAAAASUVORK5CYII=" alt="Scan to download Grain" class="qr-image">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INSTALL GUIDE -->
+<section class="install-guide" id="install-guide">
+  <h2 class="install-guide-heading">How to Install Grain</h2>
+  <p class="install-guide-reassurance">
+    Don't worry &mdash; these Android security prompts are completely normal for apps downloaded outside Google Play. Grain is safe and built with care. Just follow these simple steps. <strong>Grain is coming soon to Google Play Store and iOS!</strong>
+  </p>
+  <div class="install-steps">
+
+    <div class="install-step">
+      <div class="install-step-number">1</div>
+      <div class="install-dialog">
+        <div class="install-dialog-title">File might be harmful</div>
+        <p>Do you want to download '<strong>Grain-v1.0.0.apk</strong>' (69.44 MB) from release-assets.githubusercontent.com anyway?</p>
+        <div class="install-dialog-buttons">
+          <span class="install-dialog-btn secondary">Cancel</span>
+          <span class="install-dialog-btn text-primary">Download anyway</span>
+        </div>
+      </div>
+      <p class="install-step-instruction">Tap <strong>"Download anyway"</strong> &mdash; this warning appears for all APK files, not just Grain.</p>
+    </div>
+
+    <div class="install-step">
+      <div class="install-step-number">2</div>
+      <div class="install-dialog">
+        <span class="install-dialog-icon">&#10003;</span>
+        <div class="install-dialog-title">File downloaded</div>
+        <p>(69.44 MB)<br>release-assets.githubusercontent.com</p>
+        <div class="install-dialog-buttons">
+          <span class="install-dialog-btn primary">Open</span>
+        </div>
+      </div>
+      <p class="install-step-instruction">Once downloaded, tap <strong>"Open"</strong> to begin the installation.</p>
+    </div>
+
+    <div class="install-step">
+      <div class="install-step-number">3</div>
+      <div class="install-dialog">
+        <span class="install-dialog-icon">&#128274;</span>
+        <div class="install-dialog-title">Chrome</div>
+        <p>For your security, your phone currently isn't allowed to install unknown apps from this source. You can change this in Settings.</p>
+        <div class="install-dialog-buttons">
+          <span class="install-dialog-btn secondary">Cancel</span>
+          <span class="install-dialog-btn primary">Settings</span>
+        </div>
+      </div>
+      <p class="install-step-instruction">Tap <strong>"Settings"</strong>, then toggle on <strong>"Allow from this source"</strong>. Go back and tap Install.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div style="margin-bottom: 16px;">
+    <a href="privacy.html" style="color: rgba(255,255,255,0.7); text-decoration: none; margin: 0 12px; font-size: 14px;">Privacy Policy</a>
+    <a href="terms.html" style="color: rgba(255,255,255,0.7); text-decoration: none; margin: 0 12px; font-size: 14px;">Terms of Service</a>
+    <a href="mailto:grainapp8@gmail.com" style="color: rgba(255,255,255,0.7); text-decoration: none; margin: 0 12px; font-size: 14px;">Support</a>
+  </div>
+  <p>&copy; 2026 Grain. Small grains. Massive results.</p>
+</footer>
+
+<script>
+// ===== Navbar scroll effect =====
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// ===== Mobile menu =====
+const hamburger = document.getElementById('hamburger');
+const navLinks = document.getElementById('navLinks');
+hamburger.addEventListener('click', () => {
+  hamburger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+navLinks.querySelectorAll('a').forEach(link => {
+  link.addEventListener('click', () => {
+    hamburger.classList.remove('open');
+    navLinks.classList.remove('open');
+  });
+});
+
+// ===== Heatmap grid =====
+const grid = document.getElementById('heatmapGrid');
+const rows = 8, cols = 12;
+const filledPattern = [];
+
+// Create a realistic heatmap pattern: more filled on the right (recent), sparse on left (future)
+for (let r = 0; r < rows; r++) {
+  for (let c = 0; c < cols; c++) {
+    const threshold = c < 3 ? 0.15 : c < 5 ? 0.4 : 0.8;
+    const isFilled = Math.random() < threshold;
+    const isGold = isFilled && Math.random() < 0.04;
+    filledPattern.push({ filled: isFilled, gold: isGold });
+  }
+}
+
+filledPattern.forEach((cell, i) => {
+  const div = document.createElement('div');
+  div.classList.add('heatmap-cell');
+  if (cell.gold) {
+    div.classList.add('gold');
+  } else if (cell.filled) {
+    div.classList.add('filled');
+  }
+  // Staggered animation
+  div.style.animationDelay = (i * 15) + 'ms';
+  grid.appendChild(div);
+});
+
+// ===== Scroll reveal =====
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

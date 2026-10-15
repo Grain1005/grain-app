@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grain Plus Paywall</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal:#0FA4AF; --teal-ink:#0B7F88; --teal-soft:#E8F9FA;
+    --coral:#E64833; --sand:#EBE9E1; --sand-soft:#F7F6F1;
+    --green:#AFD275; --orange:#D9822B;
+    --ink:#1F2A2C; --muted:#6B7375; --line:#E8E6DE; --white:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito',system-ui,sans-serif;background:var(--sand-soft);color:var(--ink);min-height:100vh}
+  .wrap{max-width:1100px;margin:0 auto;padding:28px 16px 48px;display:grid;grid-template-columns:1fr 380px;gap:32px;align-items:start}
+  @media (max-width:860px){.wrap{grid-template-columns:1fr}.phone-col{order:-1}}
+
+  /* ---------- control panel ---------- */
+  h1{font-family:'Fraunces',serif;font-size:30px;font-weight:700;letter-spacing:-.01em}
+  .lede{color:var(--muted);margin:6px 0 22px;line-height:1.5}
+  .group{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px}
+  .group h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;font-weight:800}
+  .seg{display:flex;flex-wrap:wrap;gap:8px}
+  .seg button{font:inherit;font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--white);color:var(--ink);padding:8px 14px;border-radius:99px;cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--white)}
+  .notes{list-style:none;display:grid;gap:10px;font-size:14px;line-height:1.5}
+  .notes li{padding-left:18px;position:relative}
+  .notes li::before{content:"";position:absolute;left:0;top:8px;width:8px;height:8px;border-radius:99px;background:var(--teal)}
+  .notes li.flag::before{background:var(--orange)}
+  .notes b{font-weight:800}
+
+  /* ---------- phone ---------- */
+  .phone{width:360px;max-width:100%;margin:0 auto;background:var(--white);border:10px solid #1F2A2C;border-radius:38px;overflow:hidden;height:760px;display:flex;flex-direction:column}
+  .status{display:flex;justify-content:space-between;padding:10px 20px 4px;font-size:12px;font-weight:700;color:var(--ink)}
+  .screen{flex:1;overflow-y:auto;padding:6px 20px 20px;display:flex;flex-direction:column}
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+  .close{width:32px;height:32px;border-radius:99px;border:none;background:var(--sand-soft);color:var(--muted);font-size:18px;cursor:pointer;display:grid;place-items:center}
+  .pill{font-size:12px;font-weight:800;padding:5px 11px;border-radius:99px;background:var(--teal-soft);color:var(--teal-ink);letter-spacing:.02em}
+  .pill.founding{background:#FBEEDF;color:#9A5A17}
+
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;margin:4px 0 16px}
+  .grid span{aspect-ratio:1;border-radius:3px;background:var(--sand)}
+  .grid span.l1{background:#B9E6E9}.grid span.l2{background:#6CCAD1}.grid span.l3{background:var(--teal)}.grid span.hi{background:var(--orange)}
+
+  .headline{font-family:'Fraunces',serif;font-size:26px;line-height:1.15;font-weight:700;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:14.5px;line-height:1.5;margin:8px 0 16px}
+
+  .feats{list-style:none;display:grid;gap:10px;margin-bottom:16px}
+  .feats li{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;line-height:1.35}
+  .tick{flex:0 0 22px;height:22px;border-radius:99px;background:var(--teal-soft);display:grid;place-items:center}
+  .tick svg{width:12px;height:12px}
+  .feats li.focus{font-weight:800}
+  .feats small{display:block;color:var(--muted);font-weight:600;font-size:12.5px}
+
+  .compare{border:1px solid var(--line);border-radius:14px;font-size:13px;margin-bottom:16px;overflow:hidden}
+  .compare .row{display:grid;grid-template-columns:1fr 56px 56px;padding:8px 12px;border-top:1px solid var(--line);align-items:center}
+  .compare .row:first-child{border-top:none;background:var(--sand-soft);font-weight:800;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  .compare .c{text-align:center;font-weight:700}
+  .compare .yes{color:var(--teal-ink)} .compare .no{color:#B5B2A8}
+
+  .price{border:2px solid var(--teal);border-radius:18px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;position:relative}
+  .price .lbl{font-weight:800;font-size:15px}
+  .price .per{color:var(--muted);font-size:12.5px;font-weight:600}
+  .price .amt{text-align:right;font-weight:800;font-size:20px}
+  .price .amt small{display:block;font-size:12px;color:var(--muted);font-weight:600}
+  .badge{position:absolute;top:-11px;left:14px;background:var(--green);color:#2F4A12;font-size:11px;font-weight:800;padding:3px 9px;border-radius:99px}
+
+  .cta{width:100%;border:none;border-radius:14px;background:var(--teal);color:var(--white);font:inherit;font-weight:800;font-size:16px;padding:15px;cursor:pointer}
+  .cta:active{background:var(--teal-ink)}
+  .fine{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.45;margin:10px 4px 6px}
+  .links{display:flex;justify-content:center;gap:18px;font-size:13px;font-weight:700;margin-top:4px}
+  .links a{color:var(--teal-ink);text-decoration:none}
+  .links a.quiet{color:var(--muted)}
+
+  /* success */
+  .success{display:none;flex:1;flex-direction:column;justify-content:center;text-align:center;padding:10px 6px}
+  .success .seal{width:76px;height:76px;border-radius:99px;background:var(--teal);margin:0 auto 18px;display:grid;place-items:center}
+  .success .seal svg{width:34px;height:34px}
+  .success .headline{font-size:28px}
+  .trialbox{background:var(--sand-soft);border-radius:18px;padding:14px;margin:18px 0;text-align:left;font-size:14px;line-height:1.5}
+  .trialbox b{font-weight:800}
+  .show-success .paywall{display:none}
+  .show-success .success{display:flex}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section>
+    <h1>Grain Plus paywall</h1>
+    <p class="lede">Interactive mockup for approval. It's not production code. Switch the trigger to see how the paywall adapts to where the person came from, then tap the button to see the welcome screen.</p>
+
+    <div class="group">
+      <h2>Opened from</h2>
+      <div class="seg" id="triggers">
+        <button data-t="pillar" aria-pressed="true">Adding a 4th pillar</button>
+        <button data-t="export" aria-pressed="false">Export</button>
+        <button data-t="report" aria-pressed="false">Monthly report</button>
+        <button data-t="founding" aria-pressed="false">Founding 100</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>Screen</h2>
+      <div class="seg" id="states">
+        <button data-s="paywall" aria-pressed="true">Paywall</button>
+        <button data-s="success" aria-pressed="false">After subscribing</button>
+      </div>
+    </div>
+
+    <div class="group">
+      <h2>Design notes</h2>
+      <ul class="notes">
+        <li><b>One plan, one button.</b> Yearly only ($29, about $2.42/month), so there's no plan picker. The 7-day trial is the main call to action.</li>
+        <li><b>Headline matches the trigger.</b> The feature they tapped is shown in bold first in the list, so the paywall answers the question they just asked.</li>
+        <li><b>Clear trial terms</b> sit right under the button: free for 7 days, then $29/year, cancel in Google Play. Google requires this disclosure.</li>
+        <li><b>Restore purchase</b> is always visible, for reinstalls and new phones.</li>
+        <li><b>"Not now" closes it.</b> There are no countdown timers or tricks, which fits the calm Grain tone.</li>
+        <li class="flag"><b>Price shown is a placeholder.</b> In the app, the price comes from Google Play in the user's local currency (e.g. QAR, INR).</li>
+        <li class="flag"><b>Founding 100 is still to be decided.</b> How people redeem the 3 free months (Play promo codes or a special offer) is not confirmed yet.</li>
+        <li class="flag"><b>Decide:</b> show the paywall from day 1, or only after the first week of logging?</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="phone-col">
+    <div class="phone" id="phone">
+      <div class="status"><span>9:41</span><span>●●● 76%</span></div>
+      <div class="screen">
+        <!-- PAYWALL -->
+        <div class="paywall">
+          <div class="topbar">
+            <span class="pill" id="pill">GRAIN PLUS</span>
+            <button class="close" aria-label="Close" onclick="setState('paywall')">×</button>
+          </div>
+
+          <div class="grid" id="grid" aria-hidden="true"></div>
+
+          <h2 class="headline" id="headline"></h2>
+          <p class="sub" id="sub"></p>
+
+          <ul class="feats" id="feats"></ul>
+
+          <div class="compare" aria-label="Free versus Plus">
+            <div class="row"><span></span><span class="c">Free</span><span class="c">Plus</span></div>
+            <div class="row"><span>Pillars</span><span class="c">3</span><span class="c yes">∞</span></div>
+            <div class="row"><span>Daily logging, streaks, heatmap</span><span class="c yes">✓</span><span class="c yes">✓</span></div>
+            <div class="row"><span>Monthly report</span><span class="c no">Teaser</span><span class="c yes">✓</span></div>
+            <div class="row"><span>Excel &amp; PDF export</span><span class="c no">CSV</span><span class="c yes">✓</span></div>
+          </div>
+
+          <div class="price">
+            <span class="badge" id="badge">7 DAYS FREE</span>
+            <div><div class="lbl">Yearly</div><div class="per">Billed once a year</div></div>
+            <div class="amt">$29<small>≈ $2.42 / month</small></div>
+          </div>
+
+          <button class="cta" id="cta" onclick="setState('success')">Start 7-day free trial</button>
+          <p class="fine" id="fine">Free for 7 days, then $29/year. Cancel anytime in Google Play → Subscriptions. You won't be charged if you cancel before the trial ends.</p>
+          <div class="links"><a href="#" onclick="return false">Restore purchase</a><a href="#" class="quiet" onclick="return false">Not now</a></div>
+        </div>
+
+        <!-- SUCCESS -->
+        <div class="success">
+          <div class="seal"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+          <h2 class="headline">Welcome to Grain Plus</h2>
+          <p class="sub" id="successSub">Every pillar, every report, every export. Your small grains just got more room to grow.</p>
+          <div class="trialbox" id="trialbox"></div>
+          <button class="cta" id="successCta" onclick="setState('paywall')">Add your 4th pillar</button>
+          <div class="links" style="margin-top:12px"><a href="#" class="quiet" onclick="setState('paywall');return false">Back to Grain</a></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+  const tick = '<span class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="#0B7F88" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>';
+  const FEATS = {
+    pillar: ['Unlimited pillars', 'Grow every part of your life, not just three.'],
+    report: ['Monthly report', 'Minutes invested, best streaks and your strongest pillar.'],
+    export: ['Excel & PDF export', 'A formatted workbook and a shareable PDF of your progress.']
+  };
+  const COPY = {
+    pillar:  { h:'Grow more than 3 pillars', s:'Free includes 3 pillars. Plus removes the limit so you can invest in everything that matters to you.', first:'pillar', cta:'Add your 4th pillar' },
+    export:  { h:'Take your progress anywhere', s:'Export every log to Excel or a clean PDF, ready for your review, your coach or your manager.', first:'export', cta:'Export my progress' },
+    report:  { h:'See your month at a glance', s:'Your monthly report turns daily grains into one clear picture of where your time went.', first:'report', cta:'Open my monthly report' },
+    founding:{ h:'Founding 100: 3 months of Plus, on us', s:'Thank you for joining Grain early. Unlock every Plus feature free for 3 months.', first:'pillar', cta:'Explore Grain Plus' }
+  };
+  let trigger = 'pillar';
+
+  // tonal heatmap motif
+  const grid = document.getElementById('grid');
+  const pattern = '000110120221011212203221122301232312212332132233303323123233322333';
+  for (let i = 0; i < 48; i++) {
+    const s = document.createElement('span');
+    const v = +pattern[i % pattern.length];
+    s.className = i === 41 ? 'hi' : (v ? 'l' + v : '');
+    grid.appendChild(s);
+  }
+
+  function render() {
+    const c = COPY[trigger];
+    document.getElementById('headline').textContent = c.h;
+    document.getElementById('sub').textContent = c.s;
+    const order = [c.first, ...Object.keys(FEATS).filter(k => k !== c.first)];
+    document.getElementById('feats').innerHTML = order.map((k, i) =>
+      `<li class="${i === 0 ? 'focus' : ''}">${tick}<span>${FEATS[k][0]}<small>${FEATS[k][1]}</small></span></li>`).join('');
+
+    const founding = trigger === 'founding';
+    const pill = document.getElementById('pill');
+    pill.textContent = founding ? 'FOUNDING 100' : 'GRAIN PLUS';
+    pill.className = 'pill' + (founding ? ' founding' : '');
+    document.getElementById('badge').textContent = founding ? '3 MONTHS FREE' : '7 DAYS FREE';
+    document.getElementById('cta').textContent = founding ? 'Claim 3 free months' : 'Start 7-day free trial';
+    document.getElementById('fine').textContent = founding
+      ? 'Free for 3 months, then $29/year. Cancel anytime in Google Play → Subscriptions. You won’t be charged if you cancel before the free period ends.'
+      : 'Free for 7 days, then $29/year. Cancel anytime in Google Play → Subscriptions. You won’t be charged if you cancel before the trial ends.';
+
+    const days = founding ? 90 : 7;
+    const end = new Date(Date.now() + days * 864e5).toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+    document.getElementById('trialbox').innerHTML =
+      `Your free ${founding ? '3 months run' : 'trial runs'} until <b>${end}</b>. After that it's $29/year. You can cancel anytime in Google Play → Subscriptions.`;
+    document.getElementById('successCta').textContent = c.cta;
+  }
+
+  function setState(s) {
+    document.getElementById('phone').classList.toggle('show-success', s === 'success');
+    document.querySelectorAll('#states button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === s));
+  }
+
+  document.querySelectorAll('#triggers button').forEach(b => b.addEventListener('click', () => {
+    trigger = b.dataset.t;
+    document.querySelectorAll('#triggers button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    render();
+  }));
+  document.querySelectorAll('#states button').forEach(b => b.addEventListener('click', () => setState(b.dataset.s)));
+  render();
+</script>
+</body>
+</html>

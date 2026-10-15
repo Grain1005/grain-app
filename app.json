@@ -12,7 +12,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon-v2.png",
         "backgroundColor": "#0FA4AF"
       },
       "package": "com.grain.dailyapp"
@@ -26,7 +26,13 @@
       }
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "color": "#0FA4AF"
+        }
+      ]
     ]
   }
 }

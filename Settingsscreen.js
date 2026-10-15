@@ -23,6 +23,10 @@ import {
   trackPillarDeleted,
   trackLogsReset,
   trackEverythingReset,
+  trackReminderEnabled,
+  trackReminderDisabled,
+  trackReminderTimeChanged,
+  trackReminderFailed,
 } from './analytics';
 import {
   requestNotificationPermission,
@@ -30,12 +34,15 @@ import {
   cancelReminder,
   getReminderSettings,
   formatTime,
+  sendTestReminder,
+  getReminderDiagnostics,
 } from './notifications';
 
 const ONBOARDING_KEY = 'grain:onboarding_complete';
+const BATTERY_TIP_KEY = 'grain:battery_tip_shown';
 const PRIVACY_POLICY_URL = 'https://hyper-bandicoot-d84.notion.site/Grain-Privacy-Policy-f1b5a006f03544ae845ca26dba0061b4';
 const FEEDBACK_EMAIL = 'grainapp8@gmail.com';
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.grain.app';
+const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.grain.dailyapp';
 
 const PILLAR_OPTIONS = [
   { id: 'ai',            label: 'AI & Technology', icon: 'hardware-chip-outline',  category: 'AI & Technology' },
@@ -71,6 +78,8 @@ export default function SettingsScreen({ navigation }) {
   const [reminderHour, setReminderHour] = useState(8);
   const [reminderMinute, setReminderMinute] = useState(0);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [showDiagnostics, setShowDiagnostics] = useState(false);
+  const [diagnostics, setDiagnostics] = useState('');
 
   const loadPillars = useCallback(async () => {
     const stored = await getPillars();
@@ -92,22 +101,66 @@ export default function SettingsScreen({ navigation }) {
     }, [loadPillars])
   );
 
+  const showReminderError = (reason) => {
+    trackReminderFailed(reason);
+    Alert.alert(
+      'Reminder not set',
+      'Grain could not schedule your reminder. Please try again, or use "Report a bug" so we can help.',
+      [{ text: 'OK' }]
+    );
+  };
+
+  // One-time tip: Samsung and some other phones put apps to sleep and drop their reminders
+  const maybeShowBatteryTip = async () => {
+    try {
+      const shown = await AsyncStorage.getItem(BATTERY_TIP_KEY);
+      if (shown) return;
+      await AsyncStorage.setItem(BATTERY_TIP_KEY, '1');
+      Alert.alert(
+        'Make sure reminders arrive',
+        'Some phones (especially Samsung) put apps to sleep and block their reminders. In Grain\'s app settings, open Battery and choose "Unrestricted".',
+        [
+          { text: 'Later', style: 'cancel' },
+          { text: 'Open settings', onPress: () => Linking.openSettings() },
+        ]
+      );
+    } catch (e) {
+      // tip is optional
+    }
+  };
+
   const handleReminderToggle = async (value) => {
     if (value) {
-      const granted = await requestNotificationPermission();
+      const { granted, reason } = await requestNotificationPermission();
       if (!granted) {
+        trackReminderFailed(reason || 'permission_denied');
         Alert.alert(
           'Permission needed',
-          'Please enable notifications in your device settings to get daily reminders.',
-          [{ text: 'OK' }]
+          'Please allow notifications for Grain in your phone settings to get daily reminders.',
+          [
+            { text: 'Not now', style: 'cancel' },
+            { text: 'Open settings', onPress: () => Linking.openSettings() },
+          ]
         );
         return;
       }
-      await scheduleDailyReminder(reminderHour, reminderMinute);
-      setReminderEnabled(true);
+      try {
+        await scheduleDailyReminder(reminderHour, reminderMinute);
+        setReminderEnabled(true);
+        trackReminderEnabled(reminderHour, reminderMinute);
+        maybeShowBatteryTip();
+      } catch (e) {
+        setReminderEnabled(false);
+        showReminderError(e?.message || 'schedule_failed');
+      }
     } else {
-      await cancelReminder();
+      try {
+        await cancelReminder();
+      } catch (e) {
+        console.log('Cancel reminder failed:', e?.message);
+      }
       setReminderEnabled(false);
+      trackReminderDisabled();
     }
   };
 
@@ -116,7 +169,29 @@ export default function SettingsScreen({ navigation }) {
     setReminderMinute(minute);
     setShowTimePicker(false);
     if (reminderEnabled) {
-      await scheduleDailyReminder(hour, minute);
+      try {
+        await scheduleDailyReminder(hour, minute);
+        trackReminderTimeChanged(hour, minute);
+      } catch (e) {
+        showReminderError(e?.message || 'reschedule_failed');
+      }
+    }
+  };
+
+  // ---------- Hidden diagnostics (long-press "Version") ----------
+  const openDiagnostics = async () => {
+    setDiagnostics('Loading…');
+    setShowDiagnostics(true);
+    setDiagnostics(await getReminderDiagnostics());
+  };
+
+  const handleSendTest = async () => {
+    try {
+      await sendTestReminder(60);
+      setDiagnostics(await getReminderDiagnostics());
+      Alert.alert('Test scheduled', 'A test reminder should arrive in about 1 minute. You can close the app.');
+    } catch (e) {
+      Alert.alert('Test failed', e?.message || 'Unknown error');
     }
   };
 
@@ -193,8 +268,12 @@ export default function SettingsScreen({ navigation }) {
           text: 'Reset everything',
           style: 'destructive',
           onPress: async () => {
-            await cancelReminder();
-            await AsyncStorage.multiRemove([ONBOARDING_KEY, 'grain:pillars', 'grain:logs', 'grain:notes', 'grain:reminder']);
+            try {
+              await cancelReminder();
+            } catch (e) {
+              console.log('Cancel reminder failed:', e?.message);
+            }
+            await AsyncStorage.multiRemove([ONBOARDING_KEY, 'grain:pillars', 'grain:logs', 'grain:notes', 'grain:reminder', BATTERY_TIP_KEY]);
             trackEverythingReset();
             Alert.alert('Done', 'Restart the app to go through onboarding again.');
           },
@@ -213,7 +292,7 @@ export default function SettingsScreen({ navigation }) {
     try {
       await Share.share({
         message:
-          'I\'ve been using Grain to invest 8 minutes a day into things that matter. Check it out!\n\nhttps://play.google.com/store/apps/details?id=com.grain.app',
+          `I've been using Grain to invest 8 minutes a day into things that matter. Check it out!\n\n${PLAY_STORE_URL}`,
         title: 'Grain - Small grains. Massive results.',
       });
     } catch (e) {
@@ -431,7 +510,12 @@ export default function SettingsScreen({ navigation }) {
         {/* About section */}
         <Text style={styles.sectionLabel}>About</Text>
         <View style={styles.card}>
-          <View style={styles.row}>
+          <TouchableOpacity
+            style={styles.row}
+            onLongPress={openDiagnostics}
+            delayLongPress={800}
+            activeOpacity={1}
+          >
             <View style={[styles.rowIcon, { backgroundColor: '#E8F9FA' }]}>
               <Ionicons name="information-circle-outline" size={18} color={colors.teal} />
             </View>
@@ -439,7 +523,7 @@ export default function SettingsScreen({ navigation }) {
               <Text style={styles.rowLabel}>Version</Text>
             </View>
             <Text style={styles.rowValue}>1.0.0</Text>
-          </View>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.row, styles.rowLast]}
@@ -502,6 +586,34 @@ export default function SettingsScreen({ navigation }) {
               activeOpacity={0.8}
             >
               <Text style={styles.modalCloseText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Hidden reminder diagnostics (long-press Version) */}
+      <Modal
+        visible={showDiagnostics}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setShowDiagnostics(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHandle} />
+            <Text style={styles.modalTitle}>Reminder diagnostics</Text>
+            <Text style={styles.modalSub}>Screenshot this if reminders are not arriving.</Text>
+            <ScrollView style={styles.diagBox}>
+              <Text style={styles.diagText} selectable>{diagnostics}</Text>
+            </ScrollView>
+            <TouchableOpacity style={styles.diagPrimaryBtn} onPress={handleSendTest} activeOpacity={0.8}>
+              <Text style={styles.diagPrimaryText}>Send test in 1 minute</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCloseBtn} onPress={openDiagnostics} activeOpacity={0.8}>
+              <Text style={styles.modalCloseText}>Refresh</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.modalCloseBtn} onPress={() => setShowDiagnostics(false)} activeOpacity={0.8}>
+              <Text style={styles.modalCloseText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -717,5 +829,31 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: colors.textSecondary,
+  },
+
+  // Diagnostics modal
+  diagBox: {
+    maxHeight: 260,
+    backgroundColor: '#F7F6F1',
+    borderRadius: 12,
+    padding: 12,
+  },
+  diagText: {
+    fontSize: 12,
+    fontFamily: 'monospace',
+    color: colors.textPrimary,
+    lineHeight: 18,
+  },
+  diagPrimaryBtn: {
+    marginTop: 12,
+    paddingVertical: 13,
+    borderRadius: radius.button,
+    backgroundColor: colors.teal,
+    alignItems: 'center',
+  },
+  diagPrimaryText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.white,
   },
 });
