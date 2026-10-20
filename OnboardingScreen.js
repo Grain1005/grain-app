@@ -20,6 +20,11 @@ import {
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
+// 8 minutes a day x 365 days, in hours (one pillar = 49 h/year)
+const MINUTES_PER_DAY = 8;
+const hoursPerYear = (pillarCount) => Math.round((pillarCount * MINUTES_PER_DAY * 365) / 60);
+const HOURS_PER_PILLAR = hoursPerYear(1);
+
 const PILLAR_OPTIONS = [
   { id: 'ai',            label: 'AI & Technology', icon: 'hardware-chip-outline',  category: 'AI & Technology' },
   { id: 'career',        label: 'Career',           icon: 'briefcase-outline',      category: 'Career'          },
@@ -162,7 +167,7 @@ export default function OnboardingScreen({ onComplete }) {
           {/* Two stat cards side by side */}
           <View style={styles.statPair}>
             <View style={[styles.statBox, { backgroundColor: '#F0FAF0', borderColor: '#c8e6a8' }]}>
-              <Text style={[styles.statBoxNum, { color: '#5a9a2f' }]}>40</Text>
+              <Text style={[styles.statBoxNum, { color: '#5a9a2f' }]}>{HOURS_PER_PILLAR}</Text>
               <Text style={[styles.statBoxLabel, { color: '#5a9a2f' }]}>hours/year</Text>
               <Text style={styles.statBoxSub}>of focused growth</Text>
             </View>
@@ -265,7 +270,7 @@ export default function OnboardingScreen({ onComplete }) {
 
   // ═══ Screen 3: The Future — Inspired design ═══
   if (screen === 3) {
-    const totalHours = selectedPillars.length * 48;
+    const totalHours = hoursPerYear(selectedPillars.length);
     return (
       <SafeAreaView style={styles.safe}>
         <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
@@ -315,11 +320,11 @@ export default function OnboardingScreen({ onComplete }) {
                     <Ionicons name={opt ? opt.icon : 'ellipse-outline'} size={16} color={colors.teal} />
                   </View>
                   <View style={{ flex: 1 }}>
-                    <Text style={styles.futurePillarInvested}>48 hours invested in</Text>
+                    <Text style={styles.futurePillarInvested}>{HOURS_PER_PILLAR} hours invested in</Text>
                     <Text style={styles.futurePillarName}>{p.label}</Text>
                   </View>
                   <View style={styles.futurePillarBadge}>
-                    <Text style={styles.futurePillarBadgeText}>48h</Text>
+                    <Text style={styles.futurePillarBadgeText}>{HOURS_PER_PILLAR}h</Text>
                   </View>
                 </View>
               );
